@@ -15,7 +15,7 @@ import {
 } from '@mui/material'
 import { supabase } from '@/lib/supabase'
 
-const SUPER_ADMIN_KEY = process.env.NEXT_PUBLIC_SUPER_ADMIN_KEY || 'YAYA_SUPER_2024'
+const SUPER_ADMIN_KEY = process.env.NEXT_PUBLIC_SUPER_ADMIN_KEY || 'YayaSuper@2025'
 
 export default function SuperAdminSetupPage() {
   const [step, setStep] = useState(0)
