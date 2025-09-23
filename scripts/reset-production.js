@@ -61,7 +61,7 @@ async function resetDatabase() {
     console.log('\n🎉 Database reset complete!')
     console.log('🚀 Ready for fresh super admin setup at:')
     console.log('   https://yaya-pos-system.vercel.app/super-admin-setup')
-    console.log('   Setup Key: YAYA_SUPER_2024')
+    console.log('   Setup Key: YayaSuper@2025')
 
   } catch (error) {
     console.error('❌ Reset failed:', error.message)

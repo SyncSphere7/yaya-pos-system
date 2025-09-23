@@ -30,7 +30,7 @@ SELECT COUNT(*) FROM auth.users;
 1. Visit: https://yaya-pos-system.vercel.app
 2. You should see the homepage (no existing setup detected)
 3. Go to: https://yaya-pos-system.vercel.app/super-admin-setup
-4. Use setup key: `YAYA_SUPER_2024`
+4. Use setup key: `YayaSuper@2025`
 5. Create your super admin account fresh
 
 ## ✅ After Reset

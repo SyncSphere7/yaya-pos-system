@@ -52,7 +52,7 @@ async function completeReset() {
       console.log('\n🎯 Next Steps:')
       console.log('   1. Delete auth users in Supabase Dashboard (link above)')
       console.log('   2. Visit: https://yaya-pos-system.vercel.app/super-admin-setup')
-      console.log('   3. Use setup key: YAYA_SUPER_2024')
+      console.log('   3. Use setup key: YayaSuper@2025')
       console.log('   4. Create fresh super admin account')
       console.log('\n🚀 System will be ready for production use!')
     } else {
