@@ -196,7 +196,7 @@ function OverviewTab() {
                     KES {mockStats.todaySales.toLocaleString()}
                   </Typography>
                   <Typography variant="body2" color="text.secondary">
-                    Today's Sales
+                    Today&apos;s Sales
                   </Typography>
                 </Box>
               </Box>
@@ -276,7 +276,7 @@ function OverviewTab() {
             <CardContent>
               <Box display="flex" flexDirection="column" gap={2}>
                 <Button variant="outlined" fullWidth startIcon={<ReceiptIcon />}>
-                  View Today's Orders
+                  View Today&apos;s Orders
                 </Button>
                 <Button variant="outlined" fullWidth startIcon={<InventoryIcon />}>
                   Check Inventory

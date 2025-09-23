@@ -297,7 +297,7 @@ export default function SetupPage() {
               Setup Yaya Xtra Residence POS
             </Typography>
             <Typography variant="h6" color="text.secondary">
-              Let's get your restaurant system ready
+              Let&apos;s get your restaurant system ready
             </Typography>
           </Box>
 
