@@ -4,24 +4,47 @@
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
-    "build": "next build --turbopack",
+    "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "type-check": "tsc --noEmit",
+    "build:production": "NODE_ENV=production next build",
+    "start:production": "NODE_ENV=production next start",
+    "deploy": "./scripts/deploy.sh",
+    "health-check": "curl -f http://localhost:3000/api/health || exit 1",
+    "vercel:deploy": "vercel --prod",
+    "vercel:dev": "vercel dev",
+    "supabase:types": "supabase gen types typescript --project-id YOUR_PROJECT_ID > src/lib/database.types.ts"
   },
   "dependencies": {
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.1",
+    "@headlessui/react": "^2.2.8",
+    "@hookform/resolvers": "^5.2.2",
+    "@mui/icons-material": "^7.3.2",
+    "@mui/material": "^7.3.2",
+    "@supabase/supabase-js": "^2.57.4",
+    "@tanstack/react-query": "^5.90.1",
+    "@types/uuid": "^10.0.0",
+    "date-fns": "^4.1.0",
+    "lucide-react": "^0.544.0",
+    "next": "15.5.3",
     "react": "19.1.0",
     "react-dom": "19.1.0",
-    "next": "15.5.3"
+    "react-hook-form": "^7.63.0",
+    "recharts": "^3.2.1",
+    "sonner": "^2.0.7",
+    "uuid": "^13.0.0",
+    "zod": "^4.1.11",
+    "zustand": "^5.0.8"
   },
   "devDependencies": {
-    "typescript": "^5",
+    "@eslint/eslintrc": "^3",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
-    "@tailwindcss/postcss": "^4",
-    "tailwindcss": "^4",
     "eslint": "^9",
     "eslint-config-next": "15.5.3",
-    "@eslint/eslintrc": "^3"
+    "typescript": "^5"
   }
 }
