@@ -248,10 +248,7 @@ export default function SetupPage() {
           .from('departments')
           .insert(departments)
 
-        if (deptError) {
-          console.warn('Departments table not found, skipping department creation:', deptError.message)
-          // Continue setup without departments - they can be added later
-        }
+        if (deptError) throw deptError
       }
 
       setActiveStep(2)
