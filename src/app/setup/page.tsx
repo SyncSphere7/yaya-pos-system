@@ -199,6 +199,7 @@ export default function SetupPage() {
 
       if (locationError) throw locationError
 
+      // Create user first (required for RLS policies)
       const { error: userError } = await supabase
         .from('users')
         .insert({
@@ -214,6 +215,7 @@ export default function SetupPage() {
 
       if (userError) throw userError
 
+      // Now create departments (user exists for RLS)
       const departments = []
       if (setupDepartments.restaurant) {
         departments.push({
