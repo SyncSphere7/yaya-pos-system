@@ -155,6 +155,11 @@ export default function SetupPage() {
 
       if (authError) throw authError
       if (!authData.user) throw new Error('Failed to create user')
+      
+      // Check if email confirmation is required
+      if (!authData.session && authData.user && !authData.user.email_confirmed_at) {
+        throw new Error('Please check your email and confirm your account before proceeding. Then try logging in.')
+      }
 
       // Create organization first to get ID
       const { data: orgResult, error: orgError } = await supabase

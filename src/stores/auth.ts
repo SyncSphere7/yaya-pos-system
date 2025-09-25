@@ -62,8 +62,45 @@ export const useAuthStore = create<AuthState>()(
               .eq('id', authData.user.id)
               .single()
 
+            // If user profile doesn't exist, create a basic one
             if (userError || !userData) {
-              return { user: null, error: 'User profile not found' }
+              // Get first organization to assign user to
+              const { data: orgs } = await supabase
+                .from('organizations')
+                .select('id, name')
+                .limit(1)
+                .single()
+
+              if (orgs) {
+                // Create user profile
+                const { data: newUser, error: createError } = await supabase
+                  .from('users')
+                  .insert({
+                    id: authData.user.id,
+                    email: authData.user.email || email,
+                    first_name: authData.user.user_metadata?.first_name || 'Admin',
+                    last_name: authData.user.user_metadata?.last_name || 'User',
+                    role: 'admin',
+                    organization_id: orgs.id,
+                    is_active: true
+                  })
+                  .select(`
+                    *,
+                    organizations!inner(
+                      name,
+                      logo_url
+                    )
+                  `)
+                  .single()
+
+                if (!createError && newUser) {
+                  userData = newUser
+                } else {
+                  return { user: null, error: 'Failed to create user profile' }
+                }
+              } else {
+                return { user: null, error: 'No organization found. Please complete setup first.' }
+              }
             }
 
             const user: AuthUser = {
