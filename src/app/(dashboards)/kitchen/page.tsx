@@ -6,7 +6,7 @@ import { useAuthStore } from '@/stores/auth'
 import { useEffect, useState } from 'react'
 import { 
   Box,
-  Grid2 as Grid,
+  Grid,
   Paper,
   Typography,
   Button,
@@ -228,7 +228,7 @@ function KitchenDisplaySystem() {
                         <>
                           <TableIcon fontSize="small" />
                           <Typography variant="body2">
-                            Table {table.number}
+                            Table {table.name || table.id}
                           </Typography>
                         </>
                       )}

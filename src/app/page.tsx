@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { 
   Box, 
@@ -24,7 +24,9 @@ import {
   Security,
   Analytics,
   Payment,
-  ArrowForward
+  ArrowForward,
+  Business as BusinessIcon,
+  Login as LoginIcon
 } from '@mui/icons-material'
 import { useAuthStore } from '@/stores/auth'
 import { supabase } from '@/lib/supabase'
@@ -32,61 +34,34 @@ import { supabase } from '@/lib/supabase'
 export default function HomePage() {
   const router = useRouter()
   const { user, isAuthenticated, isLoading } = useAuthStore()
+  const [hasOrganizations, setHasOrganizations] = useState<boolean | null>(null)
 
   useEffect(() => {
     const checkSetup = async () => {
       if (isLoading) return
 
+      // Check if organizations exist (for display purposes only)
       const { data: orgs } = await supabase
         .from('organizations')
         .select('id')
         .limit(1)
       
-      if (!orgs || orgs.length === 0) {
-        router.push('/setup')
-        return
-      }
-
-      if (isAuthenticated && user) {
-        switch (user.role) {
-          case 'admin':
-          case 'manager':
-            router.push('/admin')
-            break
-          case 'waiter':
-          case 'cashier':
-            router.push('/pos')
-            break
-          case 'kitchen':
-            router.push('/kitchen')
-            break
-          default:
-            router.push('/login')
-        }
-      }
+      setHasOrganizations(orgs && orgs.length > 0)
     }
 
+    // No automatic redirects - users choose their path
     checkSetup()
-  }, [isAuthenticated, user, router, isLoading])
+  }, [isLoading])
 
-  const handleGetStarted = async () => {
-    const { data: orgs } = await supabase
-      .from('organizations')
-      .select('id')
-      .limit(1)
-    
-    if (!orgs || orgs.length === 0) {
-      router.push('/setup')
-    } else {
-      router.push('/login')
-    }
+  const handleSetupBusiness = () => {
+    router.push('/setup')
   }
 
   const handleLogin = () => {
     router.push('/login')
   }
 
-  if (isLoading) {
+  if (isLoading || hasOrganizations === null) {
     return (
       <Box 
         sx={{ 
@@ -219,60 +194,118 @@ export default function HomePage() {
               Complete hospitality solution for Restaurant, Bar, and Fumes operations. 
               Touch-optimized, lightning-fast, and built for the modern hospitality industry.
             </Typography>
-            <Stack 
-              direction={{ xs: 'column', sm: 'row' }} 
-              spacing={3} 
-              justifyContent="center"
-              alignItems="center"
+            {/* Main Action Buttons */}
+            <Box
+              sx={{
+                display: 'flex',
+                flexDirection: { xs: 'column', md: 'row' },
+                gap: 4,
+                justifyContent: 'center',
+                alignItems: 'center',
+                maxWidth: 800,
+                mx: 'auto'
+              }}
             >
-              <Button
-                variant="contained"
-                size="large"
-                onClick={handleLogin}
-                endIcon={<ArrowForward />}
+              {/* Setup New Business Card */}
+              <Card
+                elevation={0}
                 sx={{
+                  flex: 1,
+                  cursor: 'pointer',
                   bgcolor: 'white',
-                  color: '#1a1a1a',
-                  px: 4,
-                  py: 2,
-                  fontSize: '1.1rem',
-                  fontWeight: 600,
+                  border: '2px solid white',
                   borderRadius: 3,
-                  minWidth: 200,
-                  boxShadow: '0 4px 12px rgba(0,0,0,0.2)',
+                  transition: 'all 0.3s ease',
+                  minWidth: { xs: '100%', md: 300 },
                   '&:hover': {
-                    bgcolor: '#f5f5f5',
-                    transform: 'translateY(-2px)',
-                    boxShadow: '0 8px 20px rgba(0,0,0,0.3)'
+                    transform: 'translateY(-8px)',
+                    boxShadow: '0 20px 40px rgba(0,0,0,0.3)'
                   }
                 }}
+                onClick={handleSetupBusiness}
               >
-                Access System
-              </Button>
-              <Button
-                variant="outlined"
-                size="large"
-                onClick={handleGetStarted}
+                <CardContent sx={{ 
+                  textAlign: 'center', 
+                  p: 4,
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  height: 200
+                }}>
+                  <Avatar
+                    sx={{
+                      width: 80,
+                      height: 80,
+                      mb: 2,
+                      bgcolor: '#1a1a1a',
+                      color: 'white'
+                    }}
+                  >
+                    <BusinessIcon sx={{ fontSize: 40 }} />
+                  </Avatar>
+                  <Typography variant="h5" fontWeight={700} gutterBottom sx={{ color: '#1a1a1a' }}>
+                    Setup New Business
+                  </Typography>
+                  <Typography variant="body1" color="text.secondary" sx={{ 
+                    lineHeight: 1.5,
+                    textAlign: 'center'
+                  }}>
+                    First time? Create your restaurant and admin account
+                  </Typography>
+                </CardContent>
+              </Card>
+
+              {/* Login to Existing System Card */}
+              <Card
+                elevation={0}
                 sx={{
-                  borderColor: 'white',
-                  color: 'white',
-                  px: 4,
-                  py: 2,
-                  fontSize: '1.1rem',
-                  fontWeight: 600,
+                  flex: 1,
+                  cursor: 'pointer',
+                  bgcolor: 'white',
+                  border: '2px solid white',
                   borderRadius: 3,
-                  minWidth: 200,
+                  transition: 'all 0.3s ease',
+                  minWidth: { xs: '100%', md: 300 },
                   '&:hover': {
-                    borderColor: 'white',
-                    bgcolor: 'white',
-                    color: '#1a1a1a',
-                    transform: 'translateY(-2px)'
+                    transform: 'translateY(-8px)',
+                    boxShadow: '0 20px 40px rgba(0,0,0,0.3)'
                   }
                 }}
+                onClick={handleLogin}
               >
-                Learn More
-              </Button>
-            </Stack>
+                <CardContent sx={{ 
+                  textAlign: 'center', 
+                  p: 4,
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  height: 200
+                }}>
+                  <Avatar
+                    sx={{
+                      width: 80,
+                      height: 80,
+                      mb: 2,
+                      bgcolor: '#1a1a1a',
+                      color: 'white'
+                    }}
+                  >
+                    <LoginIcon sx={{ fontSize: 40 }} />
+                  </Avatar>
+                  <Typography variant="h5" fontWeight={700} gutterBottom sx={{ color: '#1a1a1a' }}>
+                    Login to System
+                  </Typography>
+                  <Typography variant="body1" color="text.secondary" sx={{ 
+                    lineHeight: 1.5,
+                    textAlign: 'center'
+                  }}>
+                    {hasOrganizations ? 'Access your existing POS system' : 'Staff and admin login'}
+                  </Typography>
+                </CardContent>
+              </Card>
+            </Box>
           </Box>
         </Container>
       </Box>
@@ -430,36 +463,69 @@ export default function HomePage() {
                 lineHeight: 1.6
               }}
             >
-              Join the future of hospitality management. Start processing orders, 
-              managing inventory, and growing your business today.
+              {hasOrganizations 
+                ? 'Your POS system is ready. Login to start processing orders and managing your business.' 
+                : 'Get started with your restaurant POS system. Setup takes less than 5 minutes.'}
             </Typography>
             
             <Stack spacing={2} alignItems="center">
-              <Button
-                variant="contained"
-                size="large"
-                onClick={handleLogin}
-                endIcon={<ArrowForward />}
-                sx={{
-                  bgcolor: '#1a1a1a',
-                  color: 'white',
-                  px: 6,
-                  py: 2.5,
-                  fontSize: '1.2rem',
-                  fontWeight: 600,
-                  borderRadius: 3,
-                  minWidth: 250,
-                  '&:hover': {
-                    bgcolor: '#2d2d2d',
-                    transform: 'translateY(-2px)'
-                  }
-                }}
+              <Stack 
+                direction={{ xs: 'column', sm: 'row' }} 
+                spacing={3} 
+                justifyContent="center"
+                alignItems="center"
               >
-                Access Your System
-              </Button>
+                <Button
+                  variant="contained"
+                  size="large"
+                  onClick={handleSetupBusiness}
+                  endIcon={<BusinessIcon />}
+                  sx={{
+                    bgcolor: '#1a1a1a',
+                    color: 'white',
+                    px: 6,
+                    py: 2.5,
+                    fontSize: '1.2rem',
+                    fontWeight: 600,
+                    borderRadius: 3,
+                    minWidth: 250,
+                    '&:hover': {
+                      bgcolor: '#2d2d2d',
+                      transform: 'translateY(-2px)'
+                    }
+                  }}
+                >
+                  Setup New Business
+                </Button>
+                
+                <Button
+                  variant="outlined"
+                  size="large"
+                  onClick={handleLogin}
+                  endIcon={<LoginIcon />}
+                  sx={{
+                    borderColor: '#1a1a1a',
+                    color: '#1a1a1a',
+                    px: 6,
+                    py: 2.5,
+                    fontSize: '1.2rem',
+                    fontWeight: 600,
+                    borderRadius: 3,
+                    minWidth: 250,
+                    '&:hover': {
+                      borderColor: '#1a1a1a',
+                      bgcolor: '#1a1a1a',
+                      color: 'white',
+                      transform: 'translateY(-2px)'
+                    }
+                  }}
+                >
+                  Login to System
+                </Button>
+              </Stack>
               
               <Typography variant="body2" color="text.secondary">
-                Already have an account? Sign in to continue
+                {hasOrganizations ? 'Choose setup for new business or login for existing system' : 'Get started with your POS system'}
               </Typography>
             </Stack>
           </Paper>
