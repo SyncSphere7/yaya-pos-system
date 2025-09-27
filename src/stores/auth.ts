@@ -96,10 +96,11 @@ export const useAuthStore = create<AuthState>()(
                 if (!createError && newUser) {
                   userData = newUser
                 } else {
-                  return { user: null, error: 'Failed to create user profile' }
+                  console.error('Failed to create user profile:', createError)
+                  return { user: null, error: `Failed to create user profile: ${createError?.message || 'Unknown error'}` }
                 }
               } else {
-                return { user: null, error: 'No organization found. Please complete setup first.' }
+                return { user: null, error: 'No organization found. Please complete business setup first at /setup' }
               }
             }
 
