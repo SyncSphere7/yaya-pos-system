@@ -202,12 +202,6 @@ export default function SetupPage() {
 
       if (locationError) throw locationError
 
-      // Verify auth user exists before creating profile
-      const { data: authUser } = await supabase.auth.getUser()
-      if (!authUser.user || authUser.user.id !== authData.user.id) {
-        throw new Error('Authentication user not found. Please try the setup process again.')
-      }
-
       // Create user first (required for RLS policies)
       const { error: userError } = await supabase
         .from('users')
