@@ -28,7 +28,6 @@ import {
   Delete as DeleteIcon
 } from '@mui/icons-material'
 import { supabase } from '@/lib/supabase'
-import { SimpleAuth } from '@/lib/simple-auth'
 import { useRouter } from 'next/navigation'
 
 const steps = ['Organization Details', 'Admin Account', 'Complete Setup']
@@ -193,19 +192,31 @@ export default function SetupPage() {
 
       if (locationError) throw locationError
 
-      // Create admin user with custom auth
-      const userResult = await SimpleAuth.createUser({
+      // Create admin user with Supabase Auth
+      const { data: authData, error: authError } = await supabase.auth.signUp({
         email: adminData.email,
-        password: adminData.password,
-        firstName: adminData.firstName,
-        lastName: adminData.lastName,
-        role: 'admin',
-        organizationId: orgResult.id.toString(),
-        locationId: locationResult.id.toString()
+        password: adminData.password
       })
 
-      if (userResult.error) {
-        throw new Error(userResult.error)
+      if (authError) throw authError
+      if (!authData.user) throw new Error('Failed to create user')
+
+      // Create user profile
+      const { error: userError } = await supabase
+        .from('users')
+        .insert({
+          id: authData.user.id,
+          email: adminData.email,
+          first_name: adminData.firstName,
+          last_name: adminData.lastName,
+          role: 'admin',
+          organization_id: orgResult.id,
+          location_id: locationResult.id,
+          is_active: true
+        })
+
+      if (userError) {
+        throw new Error(`Failed to create user profile: ${userError.message}`)
       }
 
       // Now create departments (user exists for RLS)
