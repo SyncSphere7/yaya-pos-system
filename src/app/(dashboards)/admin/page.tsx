@@ -282,161 +282,213 @@ function AdminDashboard() {
   }
 
   return (
-    <Box sx={{ minHeight: '100vh', bgcolor: 'background.default' }}>
+    <Box sx={{ minHeight: '100vh', bgcolor: '#1a1a1a', p: 3 }}>
       {/* Header */}
-      <AppBar position="static" color="default" elevation={1}>
-        <Toolbar sx={{ justifyContent: 'space-between', py: 1 }}>
+      <Paper
+        elevation={24}
+        sx={{
+          p: 3,
+          borderRadius: 4,
+          bgcolor: 'white',
+          mb: 3
+        }}
+      >
+        <Box display="flex" justifyContent="space-between" alignItems="center">
           <Box display="flex" alignItems="center" gap={2}>
-            <Avatar sx={{ bgcolor: 'primary.main' }}>
-              <DashboardIcon />
-            </Avatar>
+            <Box
+              sx={{
+                width: 60,
+                height: 60,
+                borderRadius: '50%',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                overflow: 'hidden'
+              }}
+            >
+              <img 
+                src="/yaya-logo.png" 
+                alt="Yaya Xtra Residence Logo" 
+                style={{ 
+                  width: '45px', 
+                  height: '45px', 
+                  objectFit: 'contain'
+                }} 
+              />
+            </Box>
             <Box>
-              <Typography variant="h5" fontWeight={600}>
+              <Typography variant="h4" fontWeight={700} sx={{ color: '#1a1a1a' }}>
                 Admin Dashboard
               </Typography>
-              <Typography variant="body2" color="text.secondary">
+              <Typography variant="body1" color="text.secondary">
                 System management and analytics
               </Typography>
             </Box>
           </Box>
 
-          <Box display="flex" alignItems="center" gap={2}>
-            <IconButton onClick={loadDashboardData}>
-              <RefreshIcon />
-            </IconButton>
-          </Box>
-        </Toolbar>
-      </AppBar>
+          <Button
+            variant="outlined"
+            startIcon={<RefreshIcon />}
+            onClick={loadDashboardData}
+            sx={{
+              borderColor: '#1a1a1a',
+              color: '#1a1a1a',
+              '&:hover': {
+                borderColor: '#2d2d2d',
+                bgcolor: 'rgba(26, 26, 26, 0.04)'
+              }
+            }}
+          >
+            Refresh
+          </Button>
+        </Box>
+      </Paper>
 
       {/* Error Alert */}
       {error && (
-        <Alert severity="error" onClose={() => setError('')} sx={{ m: 2 }}>
+        <Alert severity="error" onClose={() => setError('')} sx={{ mb: 3 }}>
           {error}
         </Alert>
       )}
 
       {/* Navigation Tabs */}
-      <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-        <Tabs value={currentTab} onChange={(e, newValue) => setCurrentTab(newValue)}>
+      <Paper
+        elevation={24}
+        sx={{
+          borderRadius: 4,
+          bgcolor: 'white',
+          mb: 3
+        }}
+      >
+        <Tabs 
+          value={currentTab} 
+          onChange={(e, newValue) => setCurrentTab(newValue)}
+          sx={{
+            '& .MuiTab-root': {
+              fontWeight: 600,
+              fontSize: '1rem'
+            }
+          }}
+        >
           <Tab label="Dashboard" />
           <Tab label="Staff Management" />
           <Tab label="Products" />
         </Tabs>
-      </Box>
+      </Paper>
 
       {/* Tab Content */}
-      <Box sx={{ p: 3 }}>
+      <Box>
         {currentTab === 0 && (
           <>
         <Grid container spacing={3} sx={{ mb: 4 }}>
           <Grid item xs={12} sm={6} md={3}>
-            <Card>
-              <CardContent>
+            <Paper elevation={24} sx={{ borderRadius: 4, bgcolor: 'white' }}>
+              <CardContent sx={{ p: 3 }}>
                 <Box display="flex" alignItems="center" gap={2}>
-                  <Avatar sx={{ bgcolor: 'success.main' }}>
-                    <AttachMoney />
+                  <Avatar sx={{ bgcolor: 'success.main', width: 56, height: 56 }}>
+                    <AttachMoney sx={{ fontSize: 28 }} />
                   </Avatar>
                   <Box>
-                    <Typography variant="h4" fontWeight={600}>
+                    <Typography variant="h4" fontWeight={700} sx={{ color: '#1a1a1a' }}>
                       {formatCurrency(stats.totalSales)}
                     </Typography>
-                    <Typography variant="body2" color="text.secondary">
+                    <Typography variant="body1" color="text.secondary" fontWeight={500}>
                       Total Sales
                     </Typography>
                   </Box>
                 </Box>
               </CardContent>
-            </Card>
+            </Paper>
           </Grid>
 
           <Grid item xs={12} sm={6} md={3}>
-            <Card>
-              <CardContent>
+            <Paper elevation={24} sx={{ borderRadius: 4, bgcolor: 'white' }}>
+              <CardContent sx={{ p: 3 }}>
                 <Box display="flex" alignItems="center" gap={2}>
-                  <Avatar sx={{ bgcolor: 'info.main' }}>
-                    <TrendingUp />
+                  <Avatar sx={{ bgcolor: 'info.main', width: 56, height: 56 }}>
+                    <TrendingUp sx={{ fontSize: 28 }} />
                   </Avatar>
                   <Box>
-                    <Typography variant="h4" fontWeight={600}>
+                    <Typography variant="h4" fontWeight={700} sx={{ color: '#1a1a1a' }}>
                       {stats.totalOrders}
                     </Typography>
-                    <Typography variant="body2" color="text.secondary">
+                    <Typography variant="body1" color="text.secondary" fontWeight={500}>
                       Total Orders
                     </Typography>
                   </Box>
                 </Box>
               </CardContent>
-            </Card>
+            </Paper>
           </Grid>
 
           <Grid item xs={12} sm={6} md={3}>
-            <Card>
-              <CardContent>
+            <Paper elevation={24} sx={{ borderRadius: 4, bgcolor: 'white' }}>
+              <CardContent sx={{ p: 3 }}>
                 <Box display="flex" alignItems="center" gap={2}>
-                  <Avatar sx={{ bgcolor: 'warning.main' }}>
-                    <People />
+                  <Avatar sx={{ bgcolor: 'warning.main', width: 56, height: 56 }}>
+                    <People sx={{ fontSize: 28 }} />
                   </Avatar>
                   <Box>
-                    <Typography variant="h4" fontWeight={600}>
+                    <Typography variant="h4" fontWeight={700} sx={{ color: '#1a1a1a' }}>
                       {stats.activeUsers}
                     </Typography>
-                    <Typography variant="body2" color="text.secondary">
+                    <Typography variant="body1" color="text.secondary" fontWeight={500}>
                       Active Users
                     </Typography>
                   </Box>
                 </Box>
               </CardContent>
-            </Card>
+            </Paper>
           </Grid>
 
           <Grid item xs={12} sm={6} md={3}>
-            <Card>
-              <CardContent>
+            <Paper elevation={24} sx={{ borderRadius: 4, bgcolor: 'white' }}>
+              <CardContent sx={{ p: 3 }}>
                 <Box display="flex" alignItems="center" gap={2}>
-                  <Avatar sx={{ bgcolor: 'secondary.main' }}>
-                    <Restaurant />
+                  <Avatar sx={{ bgcolor: 'secondary.main', width: 56, height: 56 }}>
+                    <Restaurant sx={{ fontSize: 28 }} />
                   </Avatar>
                   <Box>
-                    <Typography variant="h4" fontWeight={600}>
+                    <Typography variant="h4" fontWeight={700} sx={{ color: '#1a1a1a' }}>
                       {stats.totalProducts}
                     </Typography>
-                    <Typography variant="body2" color="text.secondary">
+                    <Typography variant="body1" color="text.secondary" fontWeight={500}>
                       Products
                     </Typography>
                   </Box>
                 </Box>
               </CardContent>
-            </Card>
+            </Paper>
           </Grid>
         </Grid>
 
         {/* Tables */}
         <Grid container spacing={3}>
           {/* Users Table */}
-          <Grid item xs={12} lg={6}>
-            <Paper sx={{ p: 3 }}>
-              <Typography variant="h6" gutterBottom>
+          <Grid item xs={12} xl={6}>
+            <Paper elevation={24} sx={{ p: 4, borderRadius: 4, bgcolor: 'white' }}>
+              <Typography variant="h5" fontWeight={700} gutterBottom sx={{ color: '#1a1a1a' }}>
                 Users Management
               </Typography>
-              <TableContainer>
-                <Table size="small">
+              <TableContainer sx={{ maxHeight: 400 }}>
+                <Table stickyHeader>
                   <TableHead>
                     <TableRow>
-                      <TableCell>Name</TableCell>
-                      <TableCell>Role</TableCell>
-                      <TableCell>Status</TableCell>
-                      <TableCell>Actions</TableCell>
+                      <TableCell sx={{ fontWeight: 600, fontSize: '0.95rem' }}>Name</TableCell>
+                      <TableCell sx={{ fontWeight: 600, fontSize: '0.95rem' }}>Role</TableCell>
+                      <TableCell sx={{ fontWeight: 600, fontSize: '0.95rem' }}>Status</TableCell>
+                      <TableCell sx={{ fontWeight: 600, fontSize: '0.95rem' }}>Actions</TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>
-                    {users.map((user) => (
-                      <TableRow key={user.id}>
+                    {users.slice(0, 10).map((user) => (
+                      <TableRow key={user.id} hover>
                         <TableCell>
                           <Box>
-                            <Typography variant="body2" fontWeight={500}>
+                            <Typography variant="body1" fontWeight={600}>
                               {user.first_name} {user.last_name}
                             </Typography>
-                            <Typography variant="caption" color="text.secondary">
+                            <Typography variant="body2" color="text.secondary">
                               {user.email}
                             </Typography>
                           </Box>
@@ -444,21 +496,26 @@ function AdminDashboard() {
                         <TableCell>
                           <Chip
                             label={user.role}
-                            size="small"
+                            size="medium"
                             color={user.role === 'admin' ? 'error' : 'default'}
+                            sx={{ fontWeight: 500 }}
                           />
                         </TableCell>
                         <TableCell>
                           <Chip
                             label={user.is_active ? 'Active' : 'Inactive'}
-                            size="small"
+                            size="medium"
                             color={user.is_active ? 'success' : 'default'}
+                            sx={{ fontWeight: 500 }}
                           />
                         </TableCell>
                         <TableCell>
                           <IconButton
-                            size="small"
                             onClick={() => toggleUserStatus(user.id, user.is_active)}
+                            sx={{
+                              bgcolor: 'rgba(26, 26, 26, 0.04)',
+                              '&:hover': { bgcolor: 'rgba(26, 26, 26, 0.08)' }
+                            }}
                           >
                             <EditIcon />
                           </IconButton>
@@ -472,43 +529,49 @@ function AdminDashboard() {
           </Grid>
 
           {/* Products Table */}
-          <Grid item xs={12} lg={6}>
-            <Paper sx={{ p: 3 }}>
-              <Typography variant="h6" gutterBottom>
+          <Grid item xs={12} xl={6}>
+            <Paper elevation={24} sx={{ p: 4, borderRadius: 4, bgcolor: 'white' }}>
+              <Typography variant="h5" fontWeight={700} gutterBottom sx={{ color: '#1a1a1a' }}>
                 Products Management
               </Typography>
-              <TableContainer>
-                <Table size="small">
+              <TableContainer sx={{ maxHeight: 400 }}>
+                <Table stickyHeader>
                   <TableHead>
                     <TableRow>
-                      <TableCell>Name</TableCell>
-                      <TableCell>Price</TableCell>
-                      <TableCell>Status</TableCell>
-                      <TableCell>Actions</TableCell>
+                      <TableCell sx={{ fontWeight: 600, fontSize: '0.95rem' }}>Name</TableCell>
+                      <TableCell sx={{ fontWeight: 600, fontSize: '0.95rem' }}>Price</TableCell>
+                      <TableCell sx={{ fontWeight: 600, fontSize: '0.95rem' }}>Status</TableCell>
+                      <TableCell sx={{ fontWeight: 600, fontSize: '0.95rem' }}>Actions</TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>
-                    {products.map((product) => (
-                      <TableRow key={product.id}>
+                    {products.slice(0, 10).map((product) => (
+                      <TableRow key={product.id} hover>
                         <TableCell>
-                          <Typography variant="body2" fontWeight={500}>
+                          <Typography variant="body1" fontWeight={600}>
                             {product.name}
                           </Typography>
                         </TableCell>
                         <TableCell>
-                          {formatCurrency(product.price)}
+                          <Typography variant="body1" fontWeight={600} color="success.main">
+                            {formatCurrency(product.price)}
+                          </Typography>
                         </TableCell>
                         <TableCell>
                           <Chip
                             label={product.is_active ? 'Active' : 'Inactive'}
-                            size="small"
+                            size="medium"
                             color={product.is_active ? 'success' : 'default'}
+                            sx={{ fontWeight: 500 }}
                           />
                         </TableCell>
                         <TableCell>
                           <IconButton
-                            size="small"
                             onClick={() => toggleProductStatus(product.id, product.is_active)}
+                            sx={{
+                              bgcolor: 'rgba(26, 26, 26, 0.04)',
+                              '&:hover': { bgcolor: 'rgba(26, 26, 26, 0.08)' }
+                            }}
                           >
                             <EditIcon />
                           </IconButton>
@@ -525,55 +588,73 @@ function AdminDashboard() {
         )}
 
         {currentTab === 1 && (
-          <StaffManagement />
+          <Paper elevation={24} sx={{ p: 4, borderRadius: 4, bgcolor: 'white' }}>
+            <StaffManagement />
+          </Paper>
         )}
 
         {currentTab === 2 && (
-          <Paper sx={{ p: 3 }}>
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
-              <Typography variant="h5" fontWeight={600}>
+          <Paper elevation={24} sx={{ p: 4, borderRadius: 4, bgcolor: 'white' }}>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4 }}>
+              <Typography variant="h4" fontWeight={700} sx={{ color: '#1a1a1a' }}>
                 Products Management
               </Typography>
               <Button
                 variant="contained"
                 startIcon={<AddIcon />}
                 onClick={() => setProductDialogOpen(true)}
+                sx={{
+                  bgcolor: '#1a1a1a',
+                  color: 'white',
+                  fontWeight: 600,
+                  px: 3,
+                  py: 1.5,
+                  '&:hover': {
+                    bgcolor: '#2d2d2d'
+                  }
+                }}
               >
                 Add Product
               </Button>
             </Box>
-            <TableContainer>
-              <Table>
+            <TableContainer sx={{ maxHeight: 600 }}>
+              <Table stickyHeader>
                 <TableHead>
                   <TableRow>
-                    <TableCell>Name</TableCell>
-                    <TableCell>Price</TableCell>
-                    <TableCell>Status</TableCell>
-                    <TableCell>Actions</TableCell>
+                    <TableCell sx={{ fontWeight: 600, fontSize: '1rem' }}>Name</TableCell>
+                    <TableCell sx={{ fontWeight: 600, fontSize: '1rem' }}>Price</TableCell>
+                    <TableCell sx={{ fontWeight: 600, fontSize: '1rem' }}>Status</TableCell>
+                    <TableCell sx={{ fontWeight: 600, fontSize: '1rem' }}>Actions</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
                   {products.map((product) => (
-                    <TableRow key={product.id}>
+                    <TableRow key={product.id} hover>
                       <TableCell>
-                        <Typography variant="body2" fontWeight={500}>
+                        <Typography variant="body1" fontWeight={600}>
                           {product.name}
                         </Typography>
                       </TableCell>
                       <TableCell>
-                        {formatCurrency(product.price)}
+                        <Typography variant="body1" fontWeight={600} color="success.main">
+                          {formatCurrency(product.price)}
+                        </Typography>
                       </TableCell>
                       <TableCell>
                         <Chip
                           label={product.is_active ? 'Active' : 'Inactive'}
-                          size="small"
+                          size="medium"
                           color={product.is_active ? 'success' : 'default'}
+                          sx={{ fontWeight: 500 }}
                         />
                       </TableCell>
                       <TableCell>
                         <IconButton
-                          size="small"
                           onClick={() => toggleProductStatus(product.id, product.is_active)}
+                          sx={{
+                            bgcolor: 'rgba(26, 26, 26, 0.04)',
+                            '&:hover': { bgcolor: 'rgba(26, 26, 26, 0.08)' }
+                          }}
                         >
                           <EditIcon />
                         </IconButton>
@@ -588,8 +669,19 @@ function AdminDashboard() {
       </Box>
 
       {/* User Dialog */}
-      <Dialog open={userDialogOpen} onClose={() => setUserDialogOpen(false)} maxWidth="sm" fullWidth>
-        <DialogTitle>Add New User</DialogTitle>
+      <Dialog 
+        open={userDialogOpen} 
+        onClose={() => setUserDialogOpen(false)} 
+        maxWidth="sm" 
+        fullWidth
+        PaperProps={{
+          sx: {
+            borderRadius: 4,
+            p: 2
+          }
+        }}
+      >
+        <DialogTitle sx={{ fontWeight: 700, fontSize: '1.5rem', color: '#1a1a1a' }}>Add New User</DialogTitle>
         <DialogContent>
           <TextField
             fullWidth
@@ -634,15 +726,51 @@ function AdminDashboard() {
             </Select>
           </FormControl>
         </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setUserDialogOpen(false)}>Cancel</Button>
-          <Button onClick={handleCreateUser} variant="contained">Create User</Button>
+        <DialogActions sx={{ p: 3, gap: 2 }}>
+          <Button 
+            onClick={() => setUserDialogOpen(false)}
+            variant="outlined"
+            sx={{
+              borderColor: '#1a1a1a',
+              color: '#1a1a1a',
+              fontWeight: 600,
+              px: 3
+            }}
+          >
+            Cancel
+          </Button>
+          <Button 
+            onClick={handleCreateUser} 
+            variant="contained"
+            sx={{
+              bgcolor: '#1a1a1a',
+              color: 'white',
+              fontWeight: 600,
+              px: 3,
+              '&:hover': {
+                bgcolor: '#2d2d2d'
+              }
+            }}
+          >
+            Create User
+          </Button>
         </DialogActions>
       </Dialog>
 
       {/* Product Dialog */}
-      <Dialog open={productDialogOpen} onClose={() => setProductDialogOpen(false)} maxWidth="sm" fullWidth>
-        <DialogTitle>Add New Product</DialogTitle>
+      <Dialog 
+        open={productDialogOpen} 
+        onClose={() => setProductDialogOpen(false)} 
+        maxWidth="sm" 
+        fullWidth
+        PaperProps={{
+          sx: {
+            borderRadius: 4,
+            p: 2
+          }
+        }}
+      >
+        <DialogTitle sx={{ fontWeight: 700, fontSize: '1.5rem', color: '#1a1a1a' }}>Add New Product</DialogTitle>
         <DialogContent>
           <TextField
             fullWidth
@@ -669,9 +797,34 @@ function AdminDashboard() {
             margin="normal"
           />
         </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setProductDialogOpen(false)}>Cancel</Button>
-          <Button onClick={handleCreateProduct} variant="contained">Create Product</Button>
+        <DialogActions sx={{ p: 3, gap: 2 }}>
+          <Button 
+            onClick={() => setProductDialogOpen(false)}
+            variant="outlined"
+            sx={{
+              borderColor: '#1a1a1a',
+              color: '#1a1a1a',
+              fontWeight: 600,
+              px: 3
+            }}
+          >
+            Cancel
+          </Button>
+          <Button 
+            onClick={handleCreateProduct} 
+            variant="contained"
+            sx={{
+              bgcolor: '#1a1a1a',
+              color: 'white',
+              fontWeight: 600,
+              px: 3,
+              '&:hover': {
+                bgcolor: '#2d2d2d'
+              }
+            }}
+          >
+            Create Product
+          </Button>
         </DialogActions>
       </Dialog>
     </Box>
