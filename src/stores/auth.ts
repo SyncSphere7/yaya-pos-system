@@ -1,7 +1,6 @@
-import { supabase } from '@/lib/supabase'
-import { User } from '@supabase/supabase-js'
 import { create } from 'zustand'
 import { devtools } from 'zustand/middleware'
+import { SimpleAuth } from '@/lib/simple-auth'
 import { User as PermissionUser, UserRole, Permission, hasPermission, canAccessRoute } from '@/lib/permissions'
 
 export interface AuthUser extends PermissionUser {
@@ -39,101 +38,39 @@ export const useAuthStore = create<AuthState>()(
 
       signIn: async (email: string, password: string) => {
         try {
-          const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
-            email,
-            password,
-          })
-
-          if (authError) {
-            return { user: null, error: authError.message }
-          }
-
-          if (authData.user) {
-            // Fetch user profile with organization info
-            const { data: userData, error: userError } = await supabase
-              .from('users')
-              .select(`
-                *,
-                organizations!inner(
-                  name,
-                  logo_url
-                )
-              `)
-              .eq('id', authData.user.id)
-              .single()
-
-            // If user profile doesn't exist, create a basic one
-            if (userError || !userData) {
-              // Get first organization to assign user to
-              const { data: orgs } = await supabase
-                .from('organizations')
-                .select('id, name')
-                .limit(1)
-                .single()
-
-              if (orgs) {
-                // Create user profile
-                const { data: newUser, error: createError } = await supabase
-                  .from('users')
-                  .insert({
-                    id: authData.user.id,
-                    email: authData.user.email || email,
-                    first_name: authData.user.user_metadata?.first_name || 'Admin',
-                    last_name: authData.user.user_metadata?.last_name || 'User',
-                    role: 'admin',
-                    organization_id: orgs.id,
-                    is_active: true
-                  })
-                  .select(`
-                    *,
-                    organizations!inner(
-                      name,
-                      logo_url
-                    )
-                  `)
-                  .single()
-
-                if (!createError && newUser) {
-                  userData = newUser
-                } else {
-                  console.error('Failed to create user profile:', createError)
-                  return { user: null, error: `Failed to create user profile: ${createError?.message || 'Unknown error'}` }
-                }
-              } else {
-                return { user: null, error: 'No organization found. Please complete business setup first at /setup' }
-              }
-            }
-
+          const result = await SimpleAuth.signIn(email, password)
+          
+          if (result.user && !result.error) {
             const user: AuthUser = {
-              id: userData.id,
-              email: userData.email,
-              full_name: `${userData.first_name} ${userData.last_name}`,
-              firstName: userData.first_name,
-              lastName: userData.last_name,
-              role: userData.role as UserRole,
-              permissions: userData.permissions || [],
-              is_super_admin: userData.is_super_admin || false,
-              department: userData.department,
-              created_by: userData.created_by,
-              organizationId: userData.organization_id || '',
-              organization_id: userData.organization_id || '',
-              locationId: userData.location_id,
-              location_id: userData.location_id,
-              isActive: userData.is_active || false,
-              pin: userData.pin,
-              pinEnabled: userData.pin_enabled,
-              employeeId: userData.employee_id,
-              organizationName: userData.organizations?.name,
-              logoUrl: userData.organizations?.logo_url,
-              created_at: userData.created_at,
-              updated_at: userData.updated_at
+              id: result.user.id,
+              email: result.user.email,
+              full_name: `${result.user.firstName} ${result.user.lastName}`,
+              firstName: result.user.firstName,
+              lastName: result.user.lastName,
+              role: result.user.role as UserRole,
+              permissions: [],
+              is_super_admin: false,
+              department: undefined,
+              created_by: undefined,
+              organizationId: result.user.organizationId,
+              organization_id: parseInt(result.user.organizationId),
+              locationId: result.user.locationId,
+              location_id: result.user.locationId ? parseInt(result.user.locationId) : undefined,
+              isActive: result.user.isActive,
+              pin: result.user.pin,
+              pinEnabled: result.user.pinEnabled,
+              employeeId: undefined,
+              organizationName: undefined,
+              logoUrl: undefined,
+              created_at: undefined,
+              updated_at: undefined
             }
 
             set({ user, isAuthenticated: true, isLoading: false })
             return { user, error: null }
           }
-
-          return { user: null, error: 'Authentication failed' }
+          
+          return { user: null, error: result.error || 'Authentication failed' }
         } catch (error) {
           return { user: null, error: 'An unexpected error occurred' }
         }
@@ -141,113 +78,51 @@ export const useAuthStore = create<AuthState>()(
 
       signInWithPin: async (pin: string, locationId?: string) => {
         try {
-          // Find user by PIN and location
-          let query = supabase
-            .from('users')
-            .select('*')
-            .eq('pin', pin)
-            .eq('pin_enabled', true)
-            .eq('is_active', true)
+          const result = await SimpleAuth.signInWithPin(pin)
+          
+          if (result.user && !result.error) {
+            const user: AuthUser = {
+              id: result.user.id,
+              email: result.user.email,
+              full_name: `${result.user.firstName} ${result.user.lastName}`,
+              firstName: result.user.firstName,
+              lastName: result.user.lastName,
+              role: result.user.role as UserRole,
+              permissions: [],
+              is_super_admin: false,
+              department: undefined,
+              created_by: undefined,
+              organizationId: result.user.organizationId,
+              organization_id: parseInt(result.user.organizationId),
+              locationId: result.user.locationId,
+              location_id: result.user.locationId ? parseInt(result.user.locationId) : undefined,
+              isActive: result.user.isActive,
+              pin: result.user.pin,
+              pinEnabled: result.user.pinEnabled,
+              employeeId: undefined,
+              organizationName: undefined,
+              logoUrl: undefined,
+              created_at: undefined,
+              updated_at: undefined
+            }
 
-          if (locationId) {
-            query = query.eq('location_id', locationId)
+            set({ user, isAuthenticated: true, isLoading: false })
+            return { user, error: null }
           }
-
-          const { data: userData, error: userError } = await query.single()
-
-          if (userError || !userData) {
-            return { user: null, error: 'Invalid PIN or user not found' }
-          }
-
-          // Create a session for PIN-based login (simplified auth)
-          const user: AuthUser = {
-            id: userData.id,
-            email: userData.email,
-            full_name: `${userData.first_name} ${userData.last_name}`,
-            firstName: userData.first_name,
-            lastName: userData.last_name,
-            role: userData.role as UserRole,
-            permissions: userData.permissions || [],
-            is_super_admin: userData.is_super_admin || false,
-            department: userData.department,
-            created_by: userData.created_by,
-            organizationId: userData.organization_id || '',
-            organization_id: userData.organization_id || '',
-            locationId: userData.location_id,
-            location_id: userData.location_id,
-            isActive: userData.is_active || false,
-            pin: userData.pin,
-            pinEnabled: userData.pin_enabled,
-            employeeId: userData.employee_id,
-            created_at: userData.created_at,
-            updated_at: userData.updated_at
-          }
-
-          set({ user, isAuthenticated: true, isLoading: false })
-          return { user, error: null }
+          
+          return { user: null, error: result.error || 'Invalid PIN' }
         } catch (error) {
           return { user: null, error: 'Authentication failed' }
         }
       },
 
       signOut: async () => {
-        await supabase.auth.signOut()
         set({ user: null, isAuthenticated: false, isLoading: false })
       },
 
       initializeAuth: async () => {
-        try {
-          const { data: { session } } = await supabase.auth.getSession()
-          
-          if (session?.user) {
-            // Fetch user profile with organization info
-            const { data: userData, error } = await supabase
-              .from('users')
-              .select(`
-                *,
-                organizations!inner(
-                  name,
-                  logo_url
-                )
-              `)
-              .eq('id', session.user.id)
-              .single()
-
-            if (!error && userData) {
-              const user: AuthUser = {
-                id: userData.id,
-                email: userData.email,
-                full_name: `${userData.first_name} ${userData.last_name}`,
-                firstName: userData.first_name,
-                lastName: userData.last_name,
-                role: userData.role as UserRole,
-                permissions: userData.permissions || [],
-                is_super_admin: userData.is_super_admin || false,
-                department: userData.department,
-                created_by: userData.created_by,
-                organizationId: userData.organization_id || '',
-                organization_id: userData.organization_id || '',
-                locationId: userData.location_id,
-                location_id: userData.location_id,
-                isActive: userData.is_active || false,
-                pin: userData.pin,
-                pinEnabled: userData.pin_enabled,
-                employeeId: userData.employee_id,
-                organizationName: userData.organizations?.name,
-                logoUrl: userData.organizations?.logo_url,
-                created_at: userData.created_at,
-                updated_at: userData.updated_at
-              }
-
-              set({ user, isAuthenticated: true, isLoading: false })
-              return
-            }
-          }
-
-          set({ user: null, isAuthenticated: false, isLoading: false })
-        } catch (error) {
-          set({ user: null, isAuthenticated: false, isLoading: false })
-        }
+        // For custom auth, no persistent sessions
+        set({ user: null, isAuthenticated: false, isLoading: false })
       },
 
       updateUser: (updates: Partial<AuthUser>) => {
@@ -259,6 +134,7 @@ export const useAuthStore = create<AuthState>()(
 
       checkSetupNeeded: async () => {
         try {
+          const { supabase } = await import('@/lib/supabase')
           const { data: organizations, error } = await supabase
             .from('organizations')
             .select('id')
@@ -266,13 +142,13 @@ export const useAuthStore = create<AuthState>()(
 
           if (error) {
             console.error('Error checking organizations:', error)
-            return false
+            return true
           }
 
           return !organizations || organizations.length === 0
         } catch (error) {
           console.error('Error checking setup needed:', error)
-          return false
+          return true
         }
       },
 

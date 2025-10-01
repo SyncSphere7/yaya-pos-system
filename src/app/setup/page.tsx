@@ -28,6 +28,7 @@ import {
   Delete as DeleteIcon
 } from '@mui/icons-material'
 import { supabase } from '@/lib/supabase'
+import { SimpleAuth } from '@/lib/simple-auth'
 import { useRouter } from 'next/navigation'
 
 const steps = ['Organization Details', 'Admin Account', 'Complete Setup']
@@ -148,16 +149,6 @@ export default function SetupPage() {
   const handleSetup = async () => {
     setLoading(true)
     try {
-      const { data: authData, error: authError } = await supabase.auth.signUp({
-        email: adminData.email,
-        password: adminData.password
-      })
-
-      if (authError) throw authError
-      if (!authData.user) throw new Error('Failed to create user')
-      
-      // Continue setup regardless of email confirmation status
-      // User can confirm email later and still login
 
       // Create organization first to get ID
       const { data: orgResult, error: orgError } = await supabase
@@ -202,23 +193,19 @@ export default function SetupPage() {
 
       if (locationError) throw locationError
 
-      // Create user first (required for RLS policies)
-      const { error: userError } = await supabase
-        .from('users')
-        .insert({
-          id: authData.user.id,
-          organization_id: orgResult.id,
-          location_id: locationResult.id,
-          email: adminData.email,
-          first_name: adminData.firstName,
-          last_name: adminData.lastName,
-          role: 'admin',
-          is_active: true
-        })
+      // Create admin user with custom auth
+      const userResult = await SimpleAuth.createUser({
+        email: adminData.email,
+        password: adminData.password,
+        firstName: adminData.firstName,
+        lastName: adminData.lastName,
+        role: 'admin',
+        organizationId: orgResult.id.toString(),
+        locationId: locationResult.id.toString()
+      })
 
-      if (userError) {
-        console.error('User creation error:', userError)
-        throw new Error(`Failed to create user profile: ${userError.message}. The user account may not have been created properly in Supabase Auth.`)
+      if (userResult.error) {
+        throw new Error(userResult.error)
       }
 
       // Now create departments (user exists for RLS)
