@@ -105,11 +105,10 @@ function AdminDashboard() {
 
   // Form states
   const [userForm, setUserForm] = useState({
-    email: '',
     first_name: '',
     last_name: '',
     role: 'waiter',
-    password: ''
+    pin: ''
   })
   const [productForm, setProductForm] = useState({
     name: '',
@@ -202,30 +201,25 @@ function AdminDashboard() {
 
   const handleCreateUser = async () => {
     try {
-      const { data: authData, error: authError } = await supabase.auth.admin.createUser({
-        email: userForm.email,
-        password: userForm.password,
-        email_confirm: true
-      })
-
-      if (authError) throw authError
-
+      // Create staff user directly in database (PIN-only, no Supabase Auth)
       const { error: userError } = await supabase
         .from('users')
         .insert({
-          id: authData.user.id,
-          email: userForm.email,
+          id: crypto.randomUUID(),
           first_name: userForm.first_name,
           last_name: userForm.last_name,
           role: userForm.role,
+          pin: userForm.pin,
+          pin_enabled: true,
           organization_id: user?.organizationId,
-          location_id: user?.locationId
+          location_id: user?.locationId,
+          is_active: true
         })
 
       if (userError) throw userError
 
       setUserDialogOpen(false)
-      setUserForm({ email: '', first_name: '', last_name: '', role: 'waiter', password: '' })
+      setUserForm({ first_name: '', last_name: '', role: 'waiter', pin: '' })
       loadUsers()
     } catch (error: any) {
       setError(error.message)
@@ -685,17 +679,11 @@ function AdminDashboard() {
         <DialogContent>
           <TextField
             fullWidth
-            label="Email"
-            value={userForm.email}
-            onChange={(e) => setUserForm({ ...userForm, email: e.target.value })}
-            margin="normal"
-          />
-          <TextField
-            fullWidth
             label="First Name"
             value={userForm.first_name}
             onChange={(e) => setUserForm({ ...userForm, first_name: e.target.value })}
             margin="normal"
+            required
           />
           <TextField
             fullWidth
@@ -703,14 +691,20 @@ function AdminDashboard() {
             value={userForm.last_name}
             onChange={(e) => setUserForm({ ...userForm, last_name: e.target.value })}
             margin="normal"
+            required
           />
           <TextField
             fullWidth
-            label="Password"
-            type="password"
-            value={userForm.password}
-            onChange={(e) => setUserForm({ ...userForm, password: e.target.value })}
+            label="PIN (4 digits)"
+            value={userForm.pin}
+            onChange={(e) => {
+              const value = e.target.value.replace(/\D/g, '').slice(0, 4)
+              setUserForm({ ...userForm, pin: value })
+            }}
             margin="normal"
+            required
+            helperText="Staff will use this 4-digit PIN to login"
+            inputProps={{ maxLength: 4, pattern: '[0-9]*' }}
           />
           <FormControl fullWidth margin="normal">
             <InputLabel>Role</InputLabel>
@@ -721,8 +715,6 @@ function AdminDashboard() {
               <MenuItem value="waiter">Waiter</MenuItem>
               <MenuItem value="kitchen">Kitchen</MenuItem>
               <MenuItem value="cashier">Cashier</MenuItem>
-              <MenuItem value="manager">Manager</MenuItem>
-              <MenuItem value="admin">Admin</MenuItem>
             </Select>
           </FormControl>
         </DialogContent>
