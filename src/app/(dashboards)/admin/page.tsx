@@ -374,19 +374,19 @@ function AdminDashboard() {
       <Box>
         {currentTab === 0 && (
           <>
-        <Grid container spacing={3} sx={{ mb: 4 }}>
+        <Grid container spacing={3} sx={{ mb: 3 }}>
           <Grid item xs={12} sm={6} md={3}>
-            <Paper elevation={24} sx={{ borderRadius: 4, bgcolor: 'white' }}>
-              <CardContent sx={{ p: 3 }}>
-                <Box display="flex" alignItems="center" gap={2}>
-                  <Avatar sx={{ bgcolor: 'success.main', width: 56, height: 56 }}>
-                    <AttachMoney sx={{ fontSize: 28 }} />
+            <Paper elevation={24} sx={{ borderRadius: 4, bgcolor: 'white', height: 80 }}>
+              <CardContent sx={{ p: 2, height: '100%', display: 'flex', alignItems: 'center' }}>
+                <Box display="flex" alignItems="center" gap={2} width="100%">
+                  <Avatar sx={{ bgcolor: 'success.main', width: 40, height: 40 }}>
+                    <AttachMoney sx={{ fontSize: 20 }} />
                   </Avatar>
                   <Box>
-                    <Typography variant="h4" fontWeight={700} sx={{ color: '#1a1a1a' }}>
+                    <Typography variant="h6" fontWeight={700} sx={{ color: '#1a1a1a' }}>
                       {formatCurrency(stats.totalSales)}
                     </Typography>
-                    <Typography variant="body1" color="text.secondary" fontWeight={500}>
+                    <Typography variant="body2" color="text.secondary" fontWeight={500}>
                       Total Sales
                     </Typography>
                   </Box>
@@ -396,17 +396,17 @@ function AdminDashboard() {
           </Grid>
 
           <Grid item xs={12} sm={6} md={3}>
-            <Paper elevation={24} sx={{ borderRadius: 4, bgcolor: 'white' }}>
-              <CardContent sx={{ p: 3 }}>
-                <Box display="flex" alignItems="center" gap={2}>
-                  <Avatar sx={{ bgcolor: 'info.main', width: 56, height: 56 }}>
-                    <TrendingUp sx={{ fontSize: 28 }} />
+            <Paper elevation={24} sx={{ borderRadius: 4, bgcolor: 'white', height: 80 }}>
+              <CardContent sx={{ p: 2, height: '100%', display: 'flex', alignItems: 'center' }}>
+                <Box display="flex" alignItems="center" gap={2} width="100%">
+                  <Avatar sx={{ bgcolor: 'info.main', width: 40, height: 40 }}>
+                    <TrendingUp sx={{ fontSize: 20 }} />
                   </Avatar>
                   <Box>
-                    <Typography variant="h4" fontWeight={700} sx={{ color: '#1a1a1a' }}>
+                    <Typography variant="h6" fontWeight={700} sx={{ color: '#1a1a1a' }}>
                       {stats.totalOrders}
                     </Typography>
-                    <Typography variant="body1" color="text.secondary" fontWeight={500}>
+                    <Typography variant="body2" color="text.secondary" fontWeight={500}>
                       Total Orders
                     </Typography>
                   </Box>
@@ -416,17 +416,17 @@ function AdminDashboard() {
           </Grid>
 
           <Grid item xs={12} sm={6} md={3}>
-            <Paper elevation={24} sx={{ borderRadius: 4, bgcolor: 'white' }}>
-              <CardContent sx={{ p: 3 }}>
-                <Box display="flex" alignItems="center" gap={2}>
-                  <Avatar sx={{ bgcolor: 'warning.main', width: 56, height: 56 }}>
-                    <People sx={{ fontSize: 28 }} />
+            <Paper elevation={24} sx={{ borderRadius: 4, bgcolor: 'white', height: 80 }}>
+              <CardContent sx={{ p: 2, height: '100%', display: 'flex', alignItems: 'center' }}>
+                <Box display="flex" alignItems="center" gap={2} width="100%">
+                  <Avatar sx={{ bgcolor: 'warning.main', width: 40, height: 40 }}>
+                    <People sx={{ fontSize: 20 }} />
                   </Avatar>
                   <Box>
-                    <Typography variant="h4" fontWeight={700} sx={{ color: '#1a1a1a' }}>
+                    <Typography variant="h6" fontWeight={700} sx={{ color: '#1a1a1a' }}>
                       {stats.activeUsers}
                     </Typography>
-                    <Typography variant="body1" color="text.secondary" fontWeight={500}>
+                    <Typography variant="body2" color="text.secondary" fontWeight={500}>
                       Active Users
                     </Typography>
                   </Box>
@@ -436,17 +436,17 @@ function AdminDashboard() {
           </Grid>
 
           <Grid item xs={12} sm={6} md={3}>
-            <Paper elevation={24} sx={{ borderRadius: 4, bgcolor: 'white' }}>
-              <CardContent sx={{ p: 3 }}>
-                <Box display="flex" alignItems="center" gap={2}>
-                  <Avatar sx={{ bgcolor: 'secondary.main', width: 56, height: 56 }}>
-                    <Restaurant sx={{ fontSize: 28 }} />
+            <Paper elevation={24} sx={{ borderRadius: 4, bgcolor: 'white', height: 80 }}>
+              <CardContent sx={{ p: 2, height: '100%', display: 'flex', alignItems: 'center' }}>
+                <Box display="flex" alignItems="center" gap={2} width="100%">
+                  <Avatar sx={{ bgcolor: 'secondary.main', width: 40, height: 40 }}>
+                    <Restaurant sx={{ fontSize: 20 }} />
                   </Avatar>
                   <Box>
-                    <Typography variant="h4" fontWeight={700} sx={{ color: '#1a1a1a' }}>
+                    <Typography variant="h6" fontWeight={700} sx={{ color: '#1a1a1a' }}>
                       {stats.totalProducts}
                     </Typography>
-                    <Typography variant="body1" color="text.secondary" fontWeight={500}>
+                    <Typography variant="body2" color="text.secondary" fontWeight={500}>
                       Products
                     </Typography>
                   </Box>
