@@ -374,84 +374,84 @@ function AdminDashboard() {
       <Box>
         {currentTab === 0 && (
           <>
-        <Grid container spacing={3} sx={{ mb: 3 }}>
+        <Grid container spacing={2} sx={{ mb: 2 }}>
           <Grid item xs={12} sm={6} md={3}>
-            <Paper elevation={24} sx={{ borderRadius: 4, bgcolor: 'white', height: 80 }}>
-              <CardContent sx={{ p: 2, height: '100%', display: 'flex', alignItems: 'center' }}>
-                <Box display="flex" alignItems="center" gap={2} width="100%">
-                  <Avatar sx={{ bgcolor: 'success.main', width: 40, height: 40 }}>
-                    <AttachMoney sx={{ fontSize: 20 }} />
+            <Paper elevation={24} sx={{ borderRadius: 3, bgcolor: 'white', height: 70 }}>
+              <Box sx={{ p: 1.5, height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <Box display="flex" alignItems="center" gap={1.5} width="100%" justifyContent="center">
+                  <Avatar sx={{ bgcolor: 'success.main', width: 35, height: 35 }}>
+                    <AttachMoney sx={{ fontSize: 18 }} />
                   </Avatar>
-                  <Box>
-                    <Typography variant="h6" fontWeight={700} sx={{ color: '#1a1a1a' }}>
+                  <Box textAlign="center">
+                    <Typography variant="h6" fontWeight={700} sx={{ color: '#1a1a1a', fontSize: '1.1rem' }}>
                       {formatCurrency(stats.totalSales)}
                     </Typography>
-                    <Typography variant="body2" color="text.secondary" fontWeight={500}>
+                    <Typography variant="caption" color="text.secondary" fontWeight={600}>
                       Total Sales
                     </Typography>
                   </Box>
                 </Box>
-              </CardContent>
+              </Box>
             </Paper>
           </Grid>
 
           <Grid item xs={12} sm={6} md={3}>
-            <Paper elevation={24} sx={{ borderRadius: 4, bgcolor: 'white', height: 80 }}>
-              <CardContent sx={{ p: 2, height: '100%', display: 'flex', alignItems: 'center' }}>
-                <Box display="flex" alignItems="center" gap={2} width="100%">
-                  <Avatar sx={{ bgcolor: 'info.main', width: 40, height: 40 }}>
-                    <TrendingUp sx={{ fontSize: 20 }} />
+            <Paper elevation={24} sx={{ borderRadius: 3, bgcolor: 'white', height: 70 }}>
+              <Box sx={{ p: 1.5, height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <Box display="flex" alignItems="center" gap={1.5} width="100%" justifyContent="center">
+                  <Avatar sx={{ bgcolor: 'info.main', width: 35, height: 35 }}>
+                    <TrendingUp sx={{ fontSize: 18 }} />
                   </Avatar>
-                  <Box>
-                    <Typography variant="h6" fontWeight={700} sx={{ color: '#1a1a1a' }}>
+                  <Box textAlign="center">
+                    <Typography variant="h6" fontWeight={700} sx={{ color: '#1a1a1a', fontSize: '1.1rem' }}>
                       {stats.totalOrders}
                     </Typography>
-                    <Typography variant="body2" color="text.secondary" fontWeight={500}>
+                    <Typography variant="caption" color="text.secondary" fontWeight={600}>
                       Total Orders
                     </Typography>
                   </Box>
                 </Box>
-              </CardContent>
+              </Box>
             </Paper>
           </Grid>
 
           <Grid item xs={12} sm={6} md={3}>
-            <Paper elevation={24} sx={{ borderRadius: 4, bgcolor: 'white', height: 80 }}>
-              <CardContent sx={{ p: 2, height: '100%', display: 'flex', alignItems: 'center' }}>
-                <Box display="flex" alignItems="center" gap={2} width="100%">
-                  <Avatar sx={{ bgcolor: 'warning.main', width: 40, height: 40 }}>
-                    <People sx={{ fontSize: 20 }} />
+            <Paper elevation={24} sx={{ borderRadius: 3, bgcolor: 'white', height: 70 }}>
+              <Box sx={{ p: 1.5, height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <Box display="flex" alignItems="center" gap={1.5} width="100%" justifyContent="center">
+                  <Avatar sx={{ bgcolor: 'warning.main', width: 35, height: 35 }}>
+                    <People sx={{ fontSize: 18 }} />
                   </Avatar>
-                  <Box>
-                    <Typography variant="h6" fontWeight={700} sx={{ color: '#1a1a1a' }}>
+                  <Box textAlign="center">
+                    <Typography variant="h6" fontWeight={700} sx={{ color: '#1a1a1a', fontSize: '1.1rem' }}>
                       {stats.activeUsers}
                     </Typography>
-                    <Typography variant="body2" color="text.secondary" fontWeight={500}>
+                    <Typography variant="caption" color="text.secondary" fontWeight={600}>
                       Active Users
                     </Typography>
                   </Box>
                 </Box>
-              </CardContent>
+              </Box>
             </Paper>
           </Grid>
 
           <Grid item xs={12} sm={6} md={3}>
-            <Paper elevation={24} sx={{ borderRadius: 4, bgcolor: 'white', height: 80 }}>
-              <CardContent sx={{ p: 2, height: '100%', display: 'flex', alignItems: 'center' }}>
-                <Box display="flex" alignItems="center" gap={2} width="100%">
-                  <Avatar sx={{ bgcolor: 'secondary.main', width: 40, height: 40 }}>
-                    <Restaurant sx={{ fontSize: 20 }} />
+            <Paper elevation={24} sx={{ borderRadius: 3, bgcolor: 'white', height: 70 }}>
+              <Box sx={{ p: 1.5, height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <Box display="flex" alignItems="center" gap={1.5} width="100%" justifyContent="center">
+                  <Avatar sx={{ bgcolor: 'secondary.main', width: 35, height: 35 }}>
+                    <Restaurant sx={{ fontSize: 18 }} />
                   </Avatar>
-                  <Box>
-                    <Typography variant="h6" fontWeight={700} sx={{ color: '#1a1a1a' }}>
+                  <Box textAlign="center">
+                    <Typography variant="h6" fontWeight={700} sx={{ color: '#1a1a1a', fontSize: '1.1rem' }}>
                       {stats.totalProducts}
                     </Typography>
-                    <Typography variant="body2" color="text.secondary" fontWeight={500}>
+                    <Typography variant="caption" color="text.secondary" fontWeight={600}>
                       Products
                     </Typography>
                   </Box>
                 </Box>
-              </CardContent>
+              </Box>
             </Paper>
           </Grid>
         </Grid>
