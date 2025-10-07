@@ -87,7 +87,7 @@ A world-class, market-ready Point of Sale (POS) system for bars and restaurants,
 - **`/`** - Landing page with role-based redirects
 - **`/pos`** - Waiter/Cashier dashboard (order entry)
 - **`/kitchen`** - Kitchen Display System
-- **`/admin`** - Admin dashboard (coming soon)
+- **`/admin`** - Admin dashboard
 - **`/login`** - Authentication page (to be built)
 
 ## 🔐 User Roles
