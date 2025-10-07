@@ -196,3 +196,7 @@ The system supports integration with:
 
 **Ready to revolutionize your restaurant operations!** 🍽️💫
 ## 🔄 Auto-Deploy Test - Wed Sep 24 00:42:22 EAT 2025
+
+
+## 👩‍💻 Developer Guide
+For a deeper technical walkthrough of the codebase (architecture, directories, key modules, data flow, state, and extension points), see CODE_OVERVIEW.md.

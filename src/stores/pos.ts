@@ -224,7 +224,7 @@ export const usePOSStore = create<POSState>()(
       },
 
       submitOrder: async () => {
-        const { cart, selectedTable, orderType } = get()
+        const { cart, selectedTable, orderType, selectedDepartment } = get()
         
         if (cart.length === 0) {
           return { success: false, error: 'Cart is empty' }
@@ -233,17 +233,44 @@ export const usePOSStore = create<POSState>()(
         try {
           set({ isLoading: true })
 
+          // Fetch current auth user to attach user_id and resolve location_id
+          const { data: auth } = await supabase.auth.getUser()
+          const supaUserId = auth?.user?.id || null
+
+          let locationId: string | null = null
+          if (supaUserId) {
+            const { data: userRow } = await supabase
+              .from('users')
+              .select('location_id')
+              .eq('id', supaUserId)
+              .single()
+            locationId = userRow?.location_id ?? null
+          }
+
+          // Generate a unique, human-friendly order number
+          const ts = new Date()
+          const y = ts.getFullYear()
+          const m = String(ts.getMonth() + 1).padStart(2, '0')
+          const d = String(ts.getDate()).padStart(2, '0')
+          const rand = Math.random().toString(36).slice(2, 6).toUpperCase()
+          const orderNumber = `ORD-${y}${m}${d}-${rand}`
+
           const subtotal = cart.reduce((sum, item) => sum + item.totalPrice, 0)
           const totalAmount = subtotal
 
-          // Create order
+          // Create order with required columns per schema
           const { data: orderData, error: orderError } = await supabase
             .from('orders')
             .insert({
+              location_id: locationId,
+              department_id: selectedDepartment,
               table_id: selectedTable,
+              user_id: supaUserId,
+              order_number: orderNumber,
               order_type: orderType,
               subtotal,
               tax_amount: 0,
+              tip_amount: 0,
               total_amount: totalAmount,
               status: 'submitted'
             })
