@@ -1,359 +1,123 @@
 'use client'
 
 import { RoleGuard } from '@/components/auth/role-guard'
-import { useKitchenStore } from '@/stores/kitchen'
 import { useAuthStore } from '@/stores/auth'
 import { useEffect, useState } from 'react'
-import { 
-  Box,
-  Grid,
-  Paper,
-  Typography,
-  Button,
-  Card,
-  CardContent,
-  AppBar,
-  Toolbar,
-  Chip,
-  Avatar,
-  List,
-  ListItem,
-  ListItemText,
-  CircularProgress,
-  IconButton,
-} from '@mui/material'
-import {
-  RestaurantMenu as MenuIcon,
-  Kitchen as KitchenIcon,
-  CheckCircle as CheckCircleIcon,
-  TableRestaurant as TableIcon,
-  Timer as TimerIcon,
-  PlayArrow as StartIcon,
-  Done as DoneIcon,
-  Refresh as RefreshIcon,
-} from '@mui/icons-material'
-import { formatDate } from '@/lib/utils'
+import { supabase } from '@/lib/supabase'
+import { formatCurrency } from '@/lib/utils'
 
 export default function KitchenPage() {
   return (
     <RoleGuard allowedRoles={['kitchen', 'manager', 'admin']}>
-      <KitchenDisplaySystem />
+      <KitchenDisplay />
     </RoleGuard>
   )
 }
 
-function KitchenDisplaySystem() {
+function KitchenDisplay() {
   const { user } = useAuthStore()
-  const {
-    orders,
-    tables,
-    selectedOrder,
-    isLoading,
-    loadOrders,
-    loadTables,
-    updateOrderStatus,
-    updateOrderItemStatus,
-    setSelectedOrder,
-    subscribeToKitchen
-  } = useKitchenStore()
-
-  const [currentTime, setCurrentTime] = useState(new Date())
+  const [orders, setOrders] = useState<any[]>([])
+  const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
     if (user?.locationId) {
-      loadOrders(user.locationId)
-      loadTables(user.locationId)
-      
-      // Subscribe to real-time updates
-      const unsubscribe = subscribeToKitchen(user.locationId)
-      return unsubscribe
+      loadOrders()
+      const subscription = supabase
+        .channel('orders')
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'orders' }, () => {
+          loadOrders()
+        })
+        .subscribe()
+
+      return () => {
+        subscription.unsubscribe()
+      }
     }
-  }, [user?.locationId, loadOrders, loadTables, subscribeToKitchen])
+  }, [user?.locationId])
 
-  // Update current time every second
-  useEffect(() => {
-    const timer = setInterval(() => setCurrentTime(new Date()), 1000)
-    return () => clearInterval(timer)
-  }, [])
+  const loadOrders = async () => {
+    setIsLoading(true)
+    const { data } = await supabase
+      .from('orders')
+      .select('*, order_items(*, products(name)), tables(table_number), users(name)')
+      .eq('location_id', user?.locationId)
+      .in('status', ['pending', 'preparing'])
+      .order('created_at', { ascending: true })
 
-  const getOrderStatusColor = (status: string, createdAt: string) => {
-    const minutesOld = Math.floor((currentTime.getTime() - new Date(createdAt).getTime()) / 60000)
-    
-    switch (status) {
-      case 'submitted':
-        return minutesOld > 15 ? 'error' : minutesOld > 10 ? 'warning' : 'info'
-      case 'preparing':
-        return minutesOld > 25 ? 'error' : minutesOld > 20 ? 'warning' : 'success'
-      case 'ready':
-        return 'secondary'
-      default:
-        return 'default'
-    }
+    setOrders(data || [])
+    setIsLoading(false)
   }
 
-  const getTimeElapsed = (createdAt: string) => {
-    const minutes = Math.floor((currentTime.getTime() - new Date(createdAt).getTime()) / 60000)
-    return minutes < 60 ? `${minutes}m` : `${Math.floor(minutes / 60)}h ${minutes % 60}m`
+  const updateStatus = async (orderId: string, status: string) => {
+    await supabase.from('orders').update({ status }).eq('id', orderId)
+    loadOrders()
   }
 
-  const handleOrderAction = async (orderId: string, newStatus: string) => {
-    await updateOrderStatus(orderId, newStatus as any)
+  const getStatusColor = (status: string) => {
+    if (status === 'pending') return 'bg-red-500'
+    if (status === 'preparing') return 'bg-yellow-500'
+    return 'bg-gray-500'
   }
 
-  const handleItemAction = async (itemId: string, newStatus: string) => {
-    await updateOrderItemStatus(itemId, newStatus as any)
+  const getOrderAge = (createdAt: string) => {
+    const minutes = Math.floor((Date.now() - new Date(createdAt).getTime()) / 60000)
+    return minutes
   }
 
-  if (isLoading) {
-    return (
-      <Box 
-        sx={{ 
-          display: 'flex', 
-          alignItems: 'center', 
-          justifyContent: 'center', 
-          minHeight: '100vh',
-          bgcolor: 'background.default'
-        }}
-      >
-        <CircularProgress size={60} />
-      </Box>
-    )
-  }
+  if (isLoading) return <div className="flex items-center justify-center min-h-screen bg-[#1a1a1a]"><div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#D4AF37]"></div></div>
 
   return (
-    <Box sx={{ minHeight: '100vh', bgcolor: 'grey.900', color: 'white' }}>
-      {/* Header */}
-      <AppBar position="static" sx={{ bgcolor: 'grey.800' }}>
-        <Toolbar sx={{ justifyContent: 'space-between', py: 2 }}>
-          <Box display="flex" alignItems="center" gap={2}>
-            <Avatar sx={{ bgcolor: 'orange.main' }}>
-              <KitchenIcon />
-            </Avatar>
-            <Box>
-              <Typography variant="h4" fontWeight={600}>
-                Kitchen Display System
-              </Typography>
-              <Typography variant="body2" color="grey.400">
-                Real-time order management
-              </Typography>
-            </Box>
-          </Box>
-          
-          <Box display="flex" alignItems="center" gap={3}>
-            <Box textAlign="right">
-              <Typography variant="h6" fontWeight={600}>
-                {currentTime.toLocaleTimeString()}
-              </Typography>
-              <Typography variant="body2" color="grey.400">
-                {currentTime.toLocaleDateString()}
-              </Typography>
-            </Box>
-            
-            <Paper sx={{ p: 2, bgcolor: 'grey.700', color: 'white' }}>
-              <Typography variant="caption" color="grey.400">
-                Active Orders
-              </Typography>
-              <Typography variant="h5" fontWeight={600}>
-                {orders.length}
-              </Typography>
-            </Paper>
+    <div className="min-h-screen bg-[#1a1a1a] p-4">
+      <div className="mb-6">
+        <h1 className="text-3xl font-bold text-white">Kitchen Display System</h1>
+        <p className="text-gray-400 mt-1">{orders.length} active orders</p>
+      </div>
 
-            <IconButton 
-              color="inherit" 
-              onClick={() => user?.locationId && loadOrders(user.locationId)}
-            >
-              <RefreshIcon />
-            </IconButton>
-          </Box>
-        </Toolbar>
-      </AppBar>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        {orders.map(order => (
+          <div key={order.id} className={`bg-white rounded-lg p-4 border-l-4 ${getStatusColor(order.status)}`}>
+            <div className="flex justify-between items-start mb-3">
+              <div>
+                <div className="text-xl font-bold">{order.order_number}</div>
+                <div className="text-sm text-gray-600">Table {(order.tables as any)?.table_number || 'Takeout'}</div>
+                <div className="text-sm text-gray-600">Waiter: {(order.users as any)?.name}</div>
+              </div>
+              <div className="text-right">
+                <div className="text-2xl font-bold text-[#D4AF37]">{getOrderAge(order.created_at)}m</div>
+                <div className="text-xs text-gray-500">ago</div>
+              </div>
+            </div>
 
-      {/* Orders Grid */}
-      <Box sx={{ p: 3 }}>
-        <Grid container spacing={3}>
-          {orders.map((order) => {
-            const table = tables.find(t => t.id === order.tableId)
-            const statusColor = getOrderStatusColor(order.status, order.createdAt)
-            const timeElapsed = getTimeElapsed(order.createdAt)
-            
-            return (
-              <Grid item xs={12} sm={6} md={4} lg={3} key={order.id}>
-                <Card 
-                  sx={{ 
-                    bgcolor: 'background.paper',
-                    border: '2px solid',
-                    borderColor: statusColor === 'error' ? 'error.main' : 
-                                statusColor === 'warning' ? 'warning.main' : 
-                                statusColor === 'success' ? 'success.main' : 
-                                'divider',
-                    cursor: 'pointer',
-                    transition: 'all 0.2s',
-                    '&:hover': {
-                      transform: 'translateY(-2px)',
-                      boxShadow: 4,
-                    }
-                  }}
-                  onClick={() => setSelectedOrder(order)}
-                >
-                  {/* Order Header */}
-                  <Box 
-                    sx={{ 
-                      p: 2, 
-                      bgcolor: statusColor === 'error' ? 'error.main' : 
-                              statusColor === 'warning' ? 'warning.main' : 
-                              statusColor === 'success' ? 'success.main' :
-                              statusColor === 'secondary' ? 'secondary.main' :
-                              'primary.main',
-                      color: 'white'
-                    }}
-                  >
-                    <Box display="flex" justifyContent="space-between" alignItems="center">
-                      <Typography variant="h6" fontWeight={600}>
-                        Order #{order.orderNumber}
-                      </Typography>
-                      <Chip 
-                        icon={<TimerIcon />}
-                        label={timeElapsed}
-                        size="small"
-                        sx={{ 
-                          bgcolor: 'rgba(255,255,255,0.2)', 
-                          color: 'white',
-                          '& .MuiChip-icon': { color: 'white' }
-                        }}
-                      />
-                    </Box>
-                    
-                    <Box display="flex" alignItems="center" gap={1} mt={1}>
-                      {table && (
-                        <>
-                          <TableIcon fontSize="small" />
-                          <Typography variant="body2">
-                            Table {table.name || table.id}
-                          </Typography>
-                        </>
-                      )}
-                      <Typography variant="body2" sx={{ ml: 'auto' }}>
-                        {order.orderType.replace('_', ' ').toUpperCase()}
-                      </Typography>
-                    </Box>
-                  </Box>
+            <div className="mb-4">
+              {(order.order_items as any[]).map((item: any) => (
+                <div key={item.id} className="flex justify-between py-2 border-b">
+                  <span className="font-semibold">{item.quantity}x {item.products.name}</span>
+                </div>
+              ))}
+            </div>
 
-                  {/* Order Items */}
-                  <CardContent sx={{ p: 0 }}>
-                    <List sx={{ py: 0 }}>
-                      {order.items.map((item, index) => (
-                        <ListItem 
-                          key={index} 
-                          sx={{ 
-                            py: 1.5, 
-                            px: 2,
-                            borderBottom: index < order.items.length - 1 ? '1px solid' : 'none',
-                            borderColor: 'divider'
-                          }}
-                        >
-                          <ListItemText
-                            primary={
-                              <Box display="flex" alignItems="center" gap={1}>
-                                <Typography variant="body1" fontWeight={500}>
-                                  {item.quantity}x {item.productName}
-                                </Typography>
-                                <Chip
-                                  label={item.status}
-                                  size="small"
-                                  color={
-                                    item.status === 'pending' ? 'default' :
-                                    item.status === 'preparing' ? 'warning' :
-                                    item.status === 'ready' ? 'success' : 'default'
-                                  }
-                                />
-                              </Box>
-                            }
-                            secondary={
-                              item.notes && (
-                                <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
-                                  Note: {item.notes}
-                                </Typography>
-                              )
-                            }
-                          />
-                        </ListItem>
-                      ))}
-                    </List>
-                  </CardContent>
+            <div className="flex gap-2">
+              {order.status === 'pending' && (
+                <button onClick={() => updateStatus(order.id, 'preparing')} className="flex-1 bg-yellow-500 text-white py-2 rounded-lg font-semibold hover:bg-yellow-600">
+                  Start Preparing
+                </button>
+              )}
+              {order.status === 'preparing' && (
+                <button onClick={() => updateStatus(order.id, 'ready')} className="flex-1 bg-green-500 text-white py-2 rounded-lg font-semibold hover:bg-green-600">
+                  Mark Ready
+                </button>
+              )}
+            </div>
+          </div>
+        ))}
 
-                  {/* Action Buttons */}
-                  <Box sx={{ p: 2, borderTop: '1px solid', borderColor: 'divider' }}>
-                    {order.status === 'submitted' && (
-                      <Button
-                        fullWidth
-                        variant="contained"
-                        color="success"
-                        startIcon={<StartIcon />}
-                        onClick={(e) => {
-                          e.stopPropagation()
-                          handleOrderAction(order.id, 'preparing')
-                        }}
-                      >
-                        Start Cooking
-                      </Button>
-                    )}
-                    
-                    {order.status === 'preparing' && (
-                      <Button
-                        fullWidth
-                        variant="contained"
-                        color="secondary"
-                        startIcon={<DoneIcon />}
-                        onClick={(e) => {
-                          e.stopPropagation()
-                          handleOrderAction(order.id, 'ready')
-                        }}
-                      >
-                        Mark Ready
-                      </Button>
-                    )}
-                    
-                    {order.status === 'ready' && (
-                      <Button
-                        fullWidth
-                        variant="outlined"
-                        color="primary"
-                        startIcon={<CheckCircleIcon />}
-                        onClick={(e) => {
-                          e.stopPropagation()
-                          handleOrderAction(order.id, 'completed')
-                        }}
-                      >
-                        Complete Order
-                      </Button>
-                    )}
-                  </Box>
-                </Card>
-              </Grid>
-            )
-          })}
-          
-          {orders.length === 0 && (
-            <Grid item xs={12}>
-              <Paper 
-                sx={{ 
-                  p: 6, 
-                  textAlign: 'center', 
-                  bgcolor: 'background.paper'
-                }}
-              >
-                <MenuIcon sx={{ fontSize: 64, color: 'text.secondary', mb: 2 }} />
-                <Typography variant="h5" gutterBottom>
-                  No Active Orders
-                </Typography>
-                <Typography variant="body2" color="text.secondary">
-                  Orders will appear here as they come in from the POS system
-                </Typography>
-              </Paper>
-            </Grid>
-          )}
-        </Grid>
-      </Box>
-    </Box>
+        {orders.length === 0 && (
+          <div className="col-span-full text-center py-12 text-gray-500">
+            <div className="text-6xl mb-4">🍳</div>
+            <div className="text-xl">No active orders</div>
+          </div>
+        )}
+      </div>
+    </div>
   )
 }
