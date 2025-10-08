@@ -6,11 +6,7 @@ import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabase'
 
 export default function TablesPage() {
-  return (
-    <RoleGuard allowedRoles={['admin', 'manager']}>
-      <TablesManagement />
-    </RoleGuard>
-  )
+  return <RoleGuard allowedRoles={['admin', 'manager']}><TablesManagement /></RoleGuard>
 }
 
 function TablesManagement() {
@@ -67,7 +63,7 @@ function TablesManagement() {
             <div className="text-2xl font-bold mb-2">T{t.table_number}</div>
             <div className="text-sm text-gray-600 mb-2">Cap: {t.capacity}</div>
             <span className={`px-2 py-1 rounded text-xs ${t.status === 'available' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>{t.status}</span>
-            <button onClick={() => deleteTable(t.id)} className="mt-3 text-red-600 text-xs">Delete</button>
+            <button onClick={() => deleteTable(t.id)} className="mt-3 text-red-600 text-xs block w-full">Delete</button>
           </div>
         ))}
       </div>
