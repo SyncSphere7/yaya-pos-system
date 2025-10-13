@@ -33,7 +33,16 @@ function StaffManagement() {
       alert('Please fill all fields. PIN must be 4 digits.')
       return
     }
-    const { error } = await supabase.from('users').insert({ name: formData.name, role: formData.role, pin: formData.pin, location_id: user?.locationId, organization_id: user?.organizationId, is_active: true })
+    const { error } = await supabase.from('users').insert({ 
+      id: crypto.randomUUID(),
+      name: formData.name, 
+      role: formData.role, 
+      pin: formData.pin, 
+      pin_enabled: true,
+      location_id: user?.locationId, 
+      organization_id: user?.organizationId, 
+      is_active: true 
+    })
     if (error) alert('Error: ' + error.message)
     else {
       setShowModal(false)
