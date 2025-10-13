@@ -15,9 +15,10 @@ export type Permission =
   | 'system.settings' | 'reports.basic' | 'staff.view' | 'tables.assign' | 'payments.process'
 
 export type UserRole = 
-  | 'super_admin' | 'accounts_manager' | 'operations_manager' 
-  | 'inventory_manager' | 'menu_manager' | 'manager' 
-  | 'waiter' | 'kitchen' | 'cashier'
+  | 'admin'
+  | 'waiter' 
+  | 'kitchen' 
+  | 'cashier'
 
 export interface User {
   id: string

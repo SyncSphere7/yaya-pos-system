@@ -5,10 +5,11 @@ import { useAuthStore } from '@/stores/auth'
 import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabase'
 import { formatCurrency } from '@/lib/utils'
+import { LogOut } from 'lucide-react'
 
 export default function POSPage() {
   return (
-    <RoleGuard allowedRoles={['waiter', 'cashier', 'manager', 'admin']}>
+    <RoleGuard allowedRoles={['waiter', 'cashier', 'admin']}>
       <POSDashboard />
     </RoleGuard>
   )
@@ -68,6 +69,10 @@ function POSDashboard() {
   const taxAmount = includeTax ? subtotal * 0.18 : 0
   const total = subtotal + taxAmount
 
+  const handleLogout = async () => {
+    await useAuthStore.getState().signOut()
+  }
+
   const handleCheckout = async () => {
     if (cart.length === 0) {
       alert('Cart is empty')
@@ -120,7 +125,22 @@ function POSDashboard() {
 
   return (
     <div className="min-h-screen bg-[#1a1a1a] p-4">
-      <div className="flex gap-4 h-[calc(100vh-2rem)]">
+      {/* Header with Logout */}
+      <div className="bg-white rounded-lg p-4 mb-4 flex justify-between items-center">
+        <div>
+          <h1 className="text-2xl font-bold text-[#1a1a1a]">Point of Sale</h1>
+          <p className="text-gray-500 text-sm">{user?.firstName} {user?.lastName}</p>
+        </div>
+        <button
+          onClick={handleLogout}
+          className="flex items-center gap-2 px-4 py-2 rounded-lg bg-red-500 text-white font-medium hover:bg-red-600 transition-colors"
+        >
+          <LogOut className="w-4 h-4" />
+          Logout
+        </button>
+      </div>
+
+      <div className="flex gap-4 h-[calc(100vh-10rem)]">
         <div className="flex-1 flex flex-col">
           <div className="bg-white rounded-lg p-4 mb-4">
             <div className="flex gap-2 overflow-x-auto">

@@ -5,10 +5,11 @@ import { useAuthStore } from '@/stores/auth'
 import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabase'
 import { formatCurrency } from '@/lib/utils'
+import { LogOut } from 'lucide-react'
 
 export default function KitchenPage() {
   return (
-    <RoleGuard allowedRoles={['kitchen', 'manager', 'admin']}>
+    <RoleGuard allowedRoles={['kitchen', 'admin']}>
       <KitchenDisplay />
     </RoleGuard>
   )
@@ -64,13 +65,27 @@ function KitchenDisplay() {
     return minutes
   }
 
+  const handleLogout = async () => {
+    await useAuthStore.getState().signOut()
+  }
+
   if (isLoading) return <div className="flex items-center justify-center min-h-screen bg-[#1a1a1a]"><div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#D4AF37]"></div></div>
 
   return (
     <div className="min-h-screen bg-[#1a1a1a] p-4">
-      <div className="mb-6">
-        <h1 className="text-3xl font-bold text-white">Kitchen Display System</h1>
-        <p className="text-gray-400 mt-1">{orders.length} active orders</p>
+      {/* Header with Logout */}
+      <div className="bg-white rounded-lg p-4 mb-4 flex justify-between items-center">
+        <div>
+          <h1 className="text-2xl font-bold text-[#1a1a1a]">Kitchen Display System</h1>
+          <p className="text-gray-500 text-sm">{orders.length} active orders</p>
+        </div>
+        <button
+          onClick={handleLogout}
+          className="flex items-center gap-2 px-4 py-2 rounded-lg bg-red-500 text-white font-medium hover:bg-red-600 transition-colors"
+        >
+          <LogOut className="w-4 h-4" />
+          Logout
+        </button>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">

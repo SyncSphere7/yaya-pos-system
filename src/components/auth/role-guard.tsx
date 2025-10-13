@@ -26,7 +26,6 @@ export function RoleGuard({ children, allowedRoles, redirectTo = '/login' }: Rol
         // Redirect based on role
         switch (user.role) {
           case 'admin':
-          case 'manager':
             router.push('/admin')
             break
           case 'waiter':

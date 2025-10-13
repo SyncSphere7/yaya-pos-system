@@ -35,7 +35,7 @@ interface Product {
 
 export default function AdminPage() {
   return (
-    <RoleGuard allowedRoles={['admin', 'manager']}>
+    <RoleGuard allowedRoles={['admin']}>
       <AdminDashboard />
     </RoleGuard>
   )
@@ -711,7 +711,7 @@ function AdminDashboard() {
                     onChange={(e) => setUserForm({ ...userForm, role: e.target.value })}
                     className="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#1a1a1a] focus:border-transparent bg-white"
                   >
-                    <option value="waiter">Waiter</option>
+                    <option value="waiter">Waiter (Orders + Payments)</option>
                     <option value="kitchen">Kitchen</option>
                     <option value="cashier">Cashier</option>
                   </select>

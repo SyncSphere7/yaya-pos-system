@@ -105,10 +105,9 @@ function StaffManagement() {
               <div className="mb-4">
                 <label className="block text-sm font-medium mb-1">Role</label>
                 <select value={formData.role} onChange={e => setFormData({ ...formData, role: e.target.value })} className="w-full px-3 py-2 border rounded-lg">
-                  <option value="waiter">Waiter</option>
+                  <option value="waiter">Waiter (Orders + Payments)</option>
                   <option value="kitchen">Kitchen</option>
                   <option value="cashier">Cashier</option>
-                  <option value="manager">Manager</option>
                 </select>
               </div>
               <div className="mb-4">
