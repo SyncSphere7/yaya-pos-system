@@ -3,7 +3,20 @@
 import { RoleGuard } from '@/components/auth/role-guard'
 import { useAuthStore } from '@/stores/auth'
 import { useEffect, useState } from 'react'
-import { LogOut, User } from 'lucide-react'
+import { 
+  Plus, 
+  RefreshCw, 
+  Edit2, 
+  DollarSign, 
+  ShoppingCart, 
+  Users as UsersIcon, 
+  Utensils,
+  ArrowUpDown,
+  X,
+  CheckCircle2,
+  AlertCircle,
+  LogOut
+} from 'lucide-react'
 import { formatCurrency } from '@/lib/utils'
 import { supabase } from '@/lib/supabase'
 
