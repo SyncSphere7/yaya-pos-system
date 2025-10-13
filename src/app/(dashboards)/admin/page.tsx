@@ -3,21 +3,7 @@
 import { RoleGuard } from '@/components/auth/role-guard'
 import { useAuthStore } from '@/stores/auth'
 import { useEffect, useState } from 'react'
-import { 
-  Plus, 
-  RefreshCw, 
-  Edit2, 
-  DollarSign, 
-  ShoppingCart, 
-  Users as UsersIcon, 
-  Utensils,
-  ArrowUpDown,
-  ChevronDown,
-  X,
-  CheckCircle2,
-  AlertCircle,
-  MoreVertical
-} from 'lucide-react'
+import { LogOut, User } from 'lucide-react'
 import { formatCurrency } from '@/lib/utils'
 import { supabase } from '@/lib/supabase'
 
@@ -231,18 +217,8 @@ function AdminDashboard() {
     }
   }
 
-  const toggleProductStatus = async (productId: string, currentStatus: boolean) => {
-    try {
-      const { error } = await supabase
-        .from('products')
-        .update({ is_active: !currentStatus })
-        .eq('id', productId)
-
-      if (error) throw error
-      loadProducts()
-    } catch (error: any) {
-      setError(error.message)
-    }
+  const handleLogout = async () => {
+    await useAuthStore.getState().signOut()
   }
 
   return (
@@ -264,13 +240,22 @@ function AdminDashboard() {
             </div>
           </div>
           
-          <button
-            onClick={loadDashboardData}
-            className="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-[#1a1a1a] text-[#1a1a1a] font-medium hover:bg-gray-50 transition-colors"
-          >
-            <RefreshCw className="w-4 h-4" />
-            Refresh
-          </button>
+          <div className="flex items-center gap-3">
+            <button
+              onClick={loadDashboardData}
+              className="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-[#1a1a1a] text-[#1a1a1a] font-medium hover:bg-gray-50 transition-colors"
+            >
+              <RefreshCw className="w-4 h-4" />
+              Refresh
+            </button>
+            <button
+              onClick={handleLogout}
+              className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-red-500 text-white font-medium hover:bg-red-600 transition-colors"
+            >
+              <LogOut className="w-4 h-4" />
+              Logout
+            </button>
+          </div>
         </div>
       </div>
 
