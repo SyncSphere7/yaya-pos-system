@@ -1,8 +1,8 @@
 const config = {
-  plugins: [
-    // Removed Tailwind CSS plugin to use Material-UI
-    // "@tailwindcss/postcss",
-  ],
+  plugins: {
+    tailwindcss: {},
+    autoprefixer: {},
+  },
 };
 
 export default config;

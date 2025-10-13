@@ -72,14 +72,15 @@ export default function HomePage() {
           bgcolor: '#1a1a1a'
         }}
       >
-        <Box textAlign="center" sx={{ color: 'white' }}>
+        <Box textAlign="center" sx={{ color: 'white', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
           <img 
             src="/yaya-logo.png" 
             alt="Yaya Xtra Residence Logo" 
             style={{ 
-              height: '80px', 
+              height: '120px', 
               width: 'auto',
-              marginBottom: '24px'
+              marginBottom: '24px',
+              display: 'block'
             }} 
           />
           <Typography variant="h6">Loading Yaya Xtra Residence POS...</Typography>
@@ -146,13 +147,14 @@ export default function HomePage() {
       >
         <Container maxWidth="lg">
           <Box textAlign="center" sx={{ mb: 8 }}>
-            <Box sx={{ mb: 4 }}>
+            <Box sx={{ mb: 4, display: 'flex', justifyContent: 'center' }}>
               <img 
                 src="/yaya-logo.png" 
                 alt="Yaya Xtra Residence Logo" 
                 style={{ 
                   height: '120px', 
-                  width: 'auto'
+                  width: 'auto',
+                  display: 'block'
                 }} 
               />
             </Box>

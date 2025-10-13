@@ -2,17 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import {
-  Box,
-  Paper,
-  Typography,
-  TextField,
-  Button,
-  Alert
-} from '@mui/material'
-import {
-  ArrowBack as BackIcon
-} from '@mui/icons-material'
+import { ArrowLeft, Shield } from 'lucide-react'
 import { useAuthStore } from '@/stores/auth'
 
 export default function AdminLoginPage() {
@@ -48,124 +38,77 @@ export default function AdminLoginPage() {
     setLoading(false)
   }
 
-  const handleBack = () => {
-    router.push('/login')
-  }
-
   return (
-    <Box
-      sx={{
-        minHeight: '100vh',
-        bgcolor: '#1a1a1a',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        p: 2
-      }}
-    >
-      <Paper
-        elevation={24}
-        sx={{
-          p: 4,
-          maxWidth: 400,
-          width: '100%',
-          borderRadius: 4,
-          bgcolor: 'white'
-        }}
+    <div className="min-h-screen bg-[#1a1a1a] flex flex-col items-center justify-center p-4">
+      {/* Back Button */}
+      <button
+        onClick={() => router.push('/login')}
+        className="absolute top-8 left-8 text-white flex items-center gap-2 hover:text-gray-300 transition-colors"
       >
-        <Box textAlign="center" mb={4}>
-          <Box
-            sx={{
-              width: 80,
-              height: 80,
-              mx: 'auto',
-              mb: 2,
-              borderRadius: '50%',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              overflow: 'hidden'
-            }}
-          >
-            <img 
-              src="/yaya-logo.png" 
-              alt="Yaya Xtra Residence Logo" 
-              style={{ 
-                width: '60px', 
-                height: '60px', 
-                objectFit: 'contain'
-              }} 
-            />
-          </Box>
-          <Typography variant="h4" fontWeight={700} gutterBottom>
-            Admin Login
-          </Typography>
-          <Typography variant="body1" color="text.secondary">
-            Enter your email and password
-          </Typography>
-        </Box>
+        <ArrowLeft className="w-5 h-5" />
+        <span className="text-lg">Back</span>
+      </button>
+
+      {/* Login Card */}
+      <div className="bg-white rounded-3xl p-8 w-full max-w-md shadow-2xl">
+        <div className="text-center mb-8">
+          <div className="flex justify-center mb-6">
+            <div className="w-20 h-20 bg-[#1a1a1a] rounded-full flex items-center justify-center">
+              <Shield className="w-10 h-10 text-white" />
+            </div>
+          </div>
+          <h1 className="text-3xl font-bold mb-2 text-[#1a1a1a]">Admin Login</h1>
+          <p className="text-gray-600">Enter your email and password</p>
+        </div>
 
         {error && (
-          <Alert severity="error" sx={{ mb: 3 }}>
-            {error}
-          </Alert>
+          <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+            <p className="text-red-600 text-sm">{error}</p>
+          </div>
         )}
 
-        <Box component="form" onSubmit={handleLogin}>
-          <TextField
-            fullWidth
-            label="Email"
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            margin="normal"
-            required
-            disabled={loading}
-          />
-          
-          <TextField
-            fullWidth
-            label="Password"
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            margin="normal"
-            required
-            disabled={loading}
-          />
+        <form onSubmit={handleLogin} className="space-y-5">
+          <div>
+            <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
+              Email Address
+            </label>
+            <input
+              id="email"
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#1a1a1a] focus:border-transparent outline-none transition-all"
+              placeholder="admin@example.com"
+              required
+              disabled={loading}
+            />
+          </div>
 
-          <Box sx={{ display: 'flex', gap: 2, mt: 3 }}>
-            <Button
-              variant="outlined"
-              fullWidth
-              startIcon={<BackIcon />}
-              onClick={handleBack}
+          <div>
+            <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
+              Password
+            </label>
+            <input
+              id="password"
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#1a1a1a] focus:border-transparent outline-none transition-all"
+              placeholder="••••••••"
+              required
               disabled={loading}
-            >
-              Back
-            </Button>
-            
-            <Button
-              type="submit"
-              variant="contained"
-              fullWidth
-              disabled={loading}
-              sx={{
-                height: 50,
-                fontSize: '1.1rem',
-                fontWeight: 600,
-                bgcolor: '#1a1a1a',
-                color: 'white',
-                '&:hover': {
-                  bgcolor: '#2d2d2d'
-                }
-              }}
-            >
-              {loading ? 'Signing in...' : 'Sign In'}
-            </Button>
-          </Box>
-        </Box>
-      </Paper>
-    </Box>
+            />
+          </div>
+
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full bg-[#1a1a1a] text-white py-4 rounded-lg font-semibold text-lg hover:bg-[#2d2d2d] disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+          >
+            {loading ? 'Signing in...' : 'Sign In'}
+          </button>
+        </form>
+      </div>
+    </div>
   )
 }
