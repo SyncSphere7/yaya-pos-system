@@ -2,39 +2,24 @@
 
 import { useState } from 'react'
 import { useRouter, usePathname } from 'next/navigation'
-import {
-  Box,
-  Drawer,
-  List,
-  ListItem,
-  ListItemButton,
-  ListItemIcon,
-  ListItemText,
-  IconButton,
-  Typography,
-  Collapse,
-  Divider
-} from '@mui/material'
-import {
-  Dashboard as DashboardIcon,
-  Analytics as AnalyticsIcon,
-  Restaurant as MenuIcon,
-  ShoppingCart as OrdersIcon,
-  People as StaffIcon,
-  Business as DepartmentsIcon,
-  TableBar as TablesIcon,
-  Inventory as InventoryIcon,
-  AccountBalance as FinanceIcon,
-  Settings as SettingsIcon,
-  Menu as MenuIconButton,
-  ChevronLeft,
-  ExpandLess,
-  ExpandMore,
-  Logout as LogoutIcon
-} from '@mui/icons-material'
+import { 
+  LayoutDashboard, 
+  TrendingUp, 
+  UtensilsCrossed, 
+  ShoppingCart, 
+  Users, 
+  Building2, 
+  Table2, 
+  Package, 
+  DollarSign, 
+  Settings, 
+  Menu, 
+  X,
+  ChevronDown,
+  ChevronRight,
+  LogOut
+} from 'lucide-react'
 import { useAuthStore } from '@/stores/auth'
-
-const DRAWER_WIDTH = 280
 
 interface NavItem {
   title: string
@@ -44,11 +29,11 @@ interface NavItem {
 }
 
 const NAV_ITEMS: NavItem[] = [
-  { title: 'Dashboard', icon: <DashboardIcon />, path: '/admin' },
-  { title: 'Analytics', icon: <AnalyticsIcon />, path: '/admin/analytics' },
+  { title: 'Dashboard', icon: <LayoutDashboard className="w-5 h-5" />, path: '/admin' },
+  { title: 'Analytics', icon: <TrendingUp className="w-5 h-5" />, path: '/admin/analytics' },
   {
     title: 'Menu Management',
-    icon: <MenuIcon />,
+    icon: <UtensilsCrossed className="w-5 h-5" />,
     path: '/admin/menu',
     children: [
       { title: 'Products', path: '/admin/menu/products' },
@@ -56,17 +41,17 @@ const NAV_ITEMS: NavItem[] = [
       { title: 'Modifiers', path: '/admin/menu/modifiers' }
     ]
   },
-  { title: 'Orders', icon: <OrdersIcon />, path: '/admin/orders' },
-  { title: 'Staff', icon: <StaffIcon />, path: '/admin/staff' },
-  { title: 'Departments', icon: <DepartmentsIcon />, path: '/admin/departments' },
-  { title: 'Tables', icon: <TablesIcon />, path: '/admin/tables' },
-  { title: 'Inventory', icon: <InventoryIcon />, path: '/admin/inventory' },
-  { title: 'Finance', icon: <FinanceIcon />, path: '/admin/finance' },
-  { title: 'Settings', icon: <SettingsIcon />, path: '/admin/settings' }
+  { title: 'Orders', icon: <ShoppingCart className="w-5 h-5" />, path: '/admin/orders' },
+  { title: 'Staff', icon: <Users className="w-5 h-5" />, path: '/admin/staff' },
+  { title: 'Departments', icon: <Building2 className="w-5 h-5" />, path: '/admin/departments' },
+  { title: 'Tables', icon: <Table2 className="w-5 h-5" />, path: '/admin/tables' },
+  { title: 'Inventory', icon: <Package className="w-5 h-5" />, path: '/admin/inventory' },
+  { title: 'Finance', icon: <DollarSign className="w-5 h-5" />, path: '/admin/finance' },
+  { title: 'Settings', icon: <Settings className="w-5 h-5" />, path: '/admin/settings' }
 ]
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
-  const [open, setOpen] = useState(true)
+  const [sidebarOpen, setSidebarOpen] = useState(false)
   const [expandedItems, setExpandedItems] = useState<string[]>([])
   const router = useRouter()
   const pathname = usePathname()
@@ -83,143 +68,123 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     router.push('/login')
   }
 
-  return (
-    <Box sx={{ display: 'flex', minHeight: '100vh', bgcolor: '#1a1a1a' }}>
-      {/* Sidebar */}
-      <Drawer
-        variant="permanent"
-        open={open}
-        sx={{
-          width: open ? DRAWER_WIDTH : 70,
-          flexShrink: 0,
-          '& .MuiDrawer-paper': {
-            width: open ? DRAWER_WIDTH : 70,
-            boxSizing: 'border-box',
-            bgcolor: 'white',
-            borderRight: '1px solid rgba(0,0,0,0.08)',
-            transition: 'width 0.3s',
-            overflowX: 'hidden'
-          }
-        }}
-      >
-        {/* Logo & Toggle */}
-        <Box sx={{ p: 2, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          {open && (
-            <Box display="flex" alignItems="center" gap={1.5}>
-              <img src="/yaya-logo.png" alt="Logo" style={{ width: 40, height: 40 }} />
-              <Typography variant="h6" fontWeight={700} sx={{ color: '#1a1a1a' }}>
-                YAYA POS
-              </Typography>
-            </Box>
-          )}
-          <IconButton onClick={() => setOpen(!open)} size="small">
-            {open ? <ChevronLeft /> : <MenuIconButton />}
-          </IconButton>
-        </Box>
+  const handleNavigation = (path: string) => {
+    router.push(path)
+    setSidebarOpen(false)
+  }
 
-        <Divider />
+  return (
+    <div className="flex min-h-screen bg-[#1a1a1a]">
+      {/* Mobile Menu Button */}
+      <button
+        onClick={() => setSidebarOpen(!sidebarOpen)}
+        className="lg:hidden fixed top-4 left-4 z-50 bg-white p-2 rounded-lg shadow-lg"
+      >
+        {sidebarOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+      </button>
+
+      {/* Overlay for mobile */}
+      {sidebarOpen && (
+        <div
+          className="lg:hidden fixed inset-0 bg-black bg-opacity-50 z-30"
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
+
+      {/* Sidebar */}
+      <aside
+        className={`
+          fixed lg:static inset-y-0 left-0 z-40
+          w-72 bg-white
+          transform transition-transform duration-300 ease-in-out
+          ${sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
+          flex flex-col
+        `}
+      >
+        {/* Logo */}
+        <div className="p-6 border-b border-gray-200">
+          <div className="flex items-center gap-3">
+            <img src="/yaya-logo.png" alt="Logo" className="w-12 h-12" />
+            <div>
+              <h1 className="text-xl font-bold text-[#1a1a1a]">YAYA POS</h1>
+              <p className="text-xs text-gray-500">Admin Dashboard</p>
+            </div>
+          </div>
+        </div>
 
         {/* Navigation */}
-        <List sx={{ px: 1, py: 2 }}>
+        <nav className="flex-1 overflow-y-auto p-4 space-y-1">
           {NAV_ITEMS.map((item) => (
-            <Box key={item.title}>
-              <ListItem disablePadding sx={{ mb: 0.5 }}>
-                <ListItemButton
-                  onClick={() => {
-                    if (item.children) {
-                      handleToggle(item.title)
-                    } else {
-                      router.push(item.path)
-                    }
-                  }}
-                  selected={pathname === item.path}
-                  sx={{
-                    borderRadius: 2,
-                    '&.Mui-selected': {
-                      bgcolor: '#D4AF37',
-                      color: 'white',
-                      '&:hover': { bgcolor: '#C19B2E' },
-                      '& .MuiListItemIcon-root': { color: 'white' }
-                    },
-                    '&:hover': { bgcolor: 'rgba(212, 175, 55, 0.1)' }
-                  }}
-                >
-                  <ListItemIcon sx={{ minWidth: 40, color: '#1a1a1a' }}>
-                    {item.icon}
-                  </ListItemIcon>
-                  {open && (
-                    <>
-                      <ListItemText
-                        primary={item.title}
-                        primaryTypographyProps={{ fontWeight: 600, fontSize: '0.95rem' }}
-                      />
-                      {item.children && (expandedItems.includes(item.title) ? <ExpandLess /> : <ExpandMore />)}
-                    </>
-                  )}
-                </ListItemButton>
-              </ListItem>
+            <div key={item.title}>
+              <button
+                onClick={() => {
+                  if (item.children) {
+                    handleToggle(item.title)
+                  } else {
+                    handleNavigation(item.path)
+                  }
+                }}
+                className={`
+                  w-full flex items-center justify-between px-4 py-3 rounded-xl
+                  transition-all duration-200
+                  ${pathname === item.path
+                    ? 'bg-[#D4AF37] text-white font-semibold'
+                    : 'text-gray-700 hover:bg-gray-100'
+                  }
+                `}
+              >
+                <div className="flex items-center gap-3">
+                  {item.icon}
+                  <span className="font-medium">{item.title}</span>
+                </div>
+                {item.children && (
+                  expandedItems.includes(item.title)
+                    ? <ChevronDown className="w-4 h-4" />
+                    : <ChevronRight className="w-4 h-4" />
+                )}
+              </button>
 
               {/* Sub-items */}
-              {item.children && open && (
-                <Collapse in={expandedItems.includes(item.title)} timeout="auto" unmountOnExit>
-                  <List component="div" disablePadding>
-                    {item.children.map((child) => (
-                      <ListItem key={child.path} disablePadding sx={{ pl: 2 }}>
-                        <ListItemButton
-                          onClick={() => router.push(child.path)}
-                          selected={pathname === child.path}
-                          sx={{
-                            borderRadius: 2,
-                            '&.Mui-selected': {
-                              bgcolor: 'rgba(212, 175, 55, 0.2)',
-                              color: '#D4AF37',
-                              '&:hover': { bgcolor: 'rgba(212, 175, 55, 0.3)' }
-                            }
-                          }}
-                        >
-                          <ListItemText
-                            primary={child.title}
-                            primaryTypographyProps={{ fontSize: '0.9rem' }}
-                          />
-                        </ListItemButton>
-                      </ListItem>
-                    ))}
-                  </List>
-                </Collapse>
+              {item.children && expandedItems.includes(item.title) && (
+                <div className="ml-4 mt-1 space-y-1">
+                  {item.children.map((child) => (
+                    <button
+                      key={child.path}
+                      onClick={() => handleNavigation(child.path)}
+                      className={`
+                        w-full flex items-center px-4 py-2 rounded-lg text-sm
+                        transition-colors
+                        ${pathname === child.path
+                          ? 'bg-[#D4AF37] bg-opacity-20 text-[#D4AF37] font-semibold'
+                          : 'text-gray-600 hover:bg-gray-100'
+                        }
+                      `}
+                    >
+                      {child.title}
+                    </button>
+                  ))}
+                </div>
               )}
-            </Box>
+            </div>
           ))}
-        </List>
+        </nav>
 
-        <Box sx={{ flexGrow: 1 }} />
-
-        {/* Logout */}
-        <Box sx={{ p: 2 }}>
-          <ListItemButton
+        {/* Logout Button */}
+        <div className="p-4 border-t border-gray-200">
+          <button
             onClick={handleLogout}
-            sx={{
-              borderRadius: 2,
-              bgcolor: 'rgba(239, 68, 68, 0.1)',
-              '&:hover': { bgcolor: 'rgba(239, 68, 68, 0.2)' }
-            }}
+            className="w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-red-50 text-red-600 hover:bg-red-100 transition-colors font-medium"
           >
-            <ListItemIcon sx={{ minWidth: 40, color: '#EF4444' }}>
-              <LogoutIcon />
-            </ListItemIcon>
-            {open && (
-              <ListItemText
-                primary="Logout"
-                primaryTypographyProps={{ fontWeight: 600, color: '#EF4444' }}
-              />
-            )}
-          </ListItemButton>
-        </Box>
-      </Drawer>
+            <LogOut className="w-5 h-5" />
+            Logout
+          </button>
+        </div>
+      </aside>
 
       {/* Main Content */}
-      <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
+      <main className="flex-1 overflow-auto">
         {children}
-      </Box>
-    </Box>
+      </main>
+    </div>
   )
 }
