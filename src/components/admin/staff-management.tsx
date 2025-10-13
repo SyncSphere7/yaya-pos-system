@@ -85,7 +85,21 @@ export function StaffManagement() {
 
       if (error) throw error
       
-      setStaff(data || [])
+      // Map snake_case from database to camelCase for interface
+      const mappedData = (data || []).map((member: any) => ({
+        id: member.id,
+        firstName: member.first_name,
+        lastName: member.last_name,
+        email: member.email,
+        role: member.role,
+        pin: member.pin,
+        pinEnabled: member.pin_enabled,
+        employeeId: member.employee_id,
+        isActive: member.is_active,
+        createdAt: member.created_at
+      }))
+      
+      setStaff(mappedData)
     } catch (error) {
       setError('Failed to load staff members')
     } finally {
