@@ -86,9 +86,164 @@ function AdminDashboard() {
     description: ''
   })
 
-  // ... (keep all the existing data loading and CRUD functions exactly the same)
-  // Just copy all the data loading and CRUD functions from the original file
-  // I'll keep them the same since we're only updating the UI
+  useEffect(() => {
+    if (user?.locationId) {
+      loadDashboardData()
+    }
+  }, [user?.locationId])
+
+  const loadDashboardData = async () => {
+    try {
+      setIsLoading(true)
+      await Promise.all([
+        loadStats(),
+        loadUsers(),
+        loadProducts()
+      ])
+    } catch (error) {
+      console.error('Error loading dashboard data:', error)
+      setError('Failed to load dashboard data')
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const loadStats = async () => {
+    if (!user?.locationId) return
+
+    const [salesResult, ordersResult, usersResult, productsResult] = await Promise.all([
+      supabase
+        .from('orders')
+        .select('total_amount')
+        .eq('location_id', user.locationId)
+        .eq('status', 'paid'),
+      supabase
+        .from('orders')
+        .select('id')
+        .eq('location_id', user.locationId),
+      supabase
+        .from('users')
+        .select('id')
+        .eq('organization_id', user.organizationId)
+        .eq('is_active', true),
+      supabase
+        .from('products')
+        .select('id')
+        .eq('location_id', user.locationId)
+        .eq('is_active', true)
+    ])
+
+    const totalSales = salesResult.data?.reduce((sum, order) => sum + (order.total_amount || 0), 0) || 0
+    
+    setStats({
+      totalSales,
+      totalOrders: ordersResult.data?.length || 0,
+      activeUsers: usersResult.data?.length || 0,
+      totalProducts: productsResult.data?.length || 0
+    })
+  }
+
+  const loadUsers = async () => {
+    if (!user?.organizationId) return
+
+    const { data, error } = await supabase
+      .from('users')
+      .select('*')
+      .eq('organization_id', user.organizationId)
+      .order('created_at', { ascending: false })
+
+    if (error) throw error
+    setUsers(data || [])
+  }
+
+  const loadProducts = async () => {
+    if (!user?.locationId) return
+
+    const { data, error } = await supabase
+      .from('products')
+      .select('*')
+      .eq('location_id', user.locationId)
+      .order('created_at', { ascending: false })
+
+    if (error) throw error
+    setProducts(data || [])
+  }
+
+  const handleCreateUser = async () => {
+    try {
+      // Create staff user directly in database (PIN-only, no Supabase Auth)
+      const { error: userError } = await supabase
+        .from('users')
+        .insert({
+          id: crypto.randomUUID(),
+          first_name: userForm.first_name,
+          last_name: userForm.last_name,
+          role: userForm.role,
+          pin: userForm.pin,
+          pin_enabled: true,
+          organization_id: user?.organizationId,
+          location_id: user?.locationId,
+          is_active: true
+        })
+
+      if (userError) throw userError
+
+      setUserDialogOpen(false)
+      setUserForm({ first_name: '', last_name: '', role: 'waiter', pin: '' })
+      loadUsers()
+    } catch (error: any) {
+      setError(error.message)
+    }
+  }
+
+  const handleCreateProduct = async () => {
+    try {
+      const { error } = await supabase
+        .from('products')
+        .insert({
+          name: productForm.name,
+          price: parseFloat(productForm.price),
+          description: productForm.description,
+          location_id: user?.locationId
+        })
+
+      if (error) throw error
+
+      setProductDialogOpen(false)
+      setProductForm({ name: '', price: '', description: '' })
+      loadProducts()
+    } catch (error: any) {
+      setError(error.message)
+    }
+  }
+
+  const toggleUserStatus = async (userId: string, currentStatus: boolean) => {
+    try {
+      const { error } = await supabase
+        .from('users')
+        .update({ is_active: !currentStatus })
+        .eq('id', userId)
+
+      if (error) throw error
+      loadUsers()
+    } catch (error: any) {
+      setError(error.message)
+    }
+  }
+
+  const toggleProductStatus = async (productId: string, currentStatus: boolean) => {
+    try {
+      const { error } = await supabase
+        .from('products')
+        .update({ is_active: !currentStatus })
+        .eq('id', productId)
+
+      if (error) throw error
+      loadProducts()
+    } catch (error: any) {
+      setError(error.message)
+    }
+  }
 
   return (
     <div className="min-h-screen bg-[#1a1a1a] p-6">
@@ -110,7 +265,7 @@ function AdminDashboard() {
           </div>
           
           <button
-            onClick={() => {}}
+            onClick={loadDashboardData}
             className="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-[#1a1a1a] text-[#1a1a1a] font-medium hover:bg-gray-50 transition-colors"
           >
             <RefreshCw className="w-4 h-4" />
@@ -177,7 +332,7 @@ function AdminDashboard() {
                   </div>
                   <div>
                     <p className="text-sm text-gray-500">Total Sales</p>
-                    <p className="text-2xl font-bold text-[#1a1a1a]">₱0.00</p>
+                    <p className="text-2xl font-bold text-[#1a1a1a]">{formatCurrency(stats.totalSales)}</p>
                   </div>
                 </div>
               </div>
@@ -190,7 +345,7 @@ function AdminDashboard() {
                   </div>
                   <div>
                     <p className="text-sm text-gray-500">Total Orders</p>
-                    <p className="text-2xl font-bold text-[#1a1a1a]">0</p>
+                    <p className="text-2xl font-bold text-[#1a1a1a]">{stats.totalOrders}</p>
                   </div>
                 </div>
               </div>
@@ -203,7 +358,7 @@ function AdminDashboard() {
                   </div>
                   <div>
                     <p className="text-sm text-gray-500">Active Users</p>
-                    <p className="text-2xl font-bold text-[#1a1a1a]">0</p>
+                    <p className="text-2xl font-bold text-[#1a1a1a]">{stats.activeUsers}</p>
                   </div>
                 </div>
               </div>
@@ -216,7 +371,7 @@ function AdminDashboard() {
                   </div>
                   <div>
                     <p className="text-sm text-gray-500">Total Products</p>
-                    <p className="text-2xl font-bold text-[#1a1a1a]">0</p>
+                    <p className="text-2xl font-bold text-[#1a1a1a]">{stats.totalProducts}</p>
                   </div>
                 </div>
               </div>
@@ -261,11 +416,58 @@ function AdminDashboard() {
                       </tr>
                     </thead>
                     <tbody className="bg-white divide-y divide-gray-200">
-                      <tr>
-                        <td colSpan={4} className="px-4 py-12 text-center text-gray-500">
-                          No users found. Click "Add User" to get started.
-                        </td>
-                      </tr>
+                      {users.length === 0 ? (
+                        <tr>
+                          <td colSpan={4} className="px-4 py-12 text-center text-gray-500">
+                            No users found. Click "Add User" to get started.
+                          </td>
+                        </tr>
+                      ) : (
+                        users.slice(0, 10).map((user) => (
+                          <tr key={user.id} className="hover:bg-gray-50">
+                            <td className="px-4 py-4 whitespace-nowrap">
+                              <div>
+                                <div className="font-medium text-[#1a1a1a]">
+                                  {user.first_name} {user.last_name}
+                                </div>
+                                <div className="text-sm text-gray-500">{user.email}</div>
+                              </div>
+                            </td>
+                            <td className="px-4 py-4 whitespace-nowrap">
+                              <span className={`px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                                user.role === 'admin' 
+                                  ? 'bg-red-100 text-red-800' 
+                                  : 'bg-gray-100 text-gray-800'
+                              }`}>
+                                {user.role}
+                              </span>
+                            </td>
+                            <td className="px-4 py-4 whitespace-nowrap">
+                              <div className="flex items-center">
+                                {user.is_active ? (
+                                  <>
+                                    <CheckCircle2 className="w-4 h-4 text-green-500 mr-1.5" />
+                                    <span className="text-sm text-gray-800">Active</span>
+                                  </>
+                                ) : (
+                                  <>
+                                    <X className="w-4 h-4 text-red-500 mr-1.5" />
+                                    <span className="text-sm text-gray-800">Inactive</span>
+                                  </>
+                                )}
+                              </div>
+                            </td>
+                            <td className="px-4 py-4 whitespace-nowrap text-right text-sm font-medium">
+                              <button
+                                onClick={() => toggleUserStatus(user.id, user.is_active)}
+                                className="text-gray-400 hover:text-[#1a1a1a] p-1.5 rounded-lg hover:bg-gray-100"
+                              >
+                                <Edit2 className="w-4 h-4" />
+                              </button>
+                            </td>
+                          </tr>
+                        ))
+                      )}
                     </tbody>
                   </table>
                 </div>
@@ -303,11 +505,51 @@ function AdminDashboard() {
                       </tr>
                     </thead>
                     <tbody className="bg-white divide-y divide-gray-200">
-                      <tr>
-                        <td colSpan={4} className="px-4 py-12 text-center text-gray-500">
-                          No products found. Click "Add Product" to get started.
-                        </td>
-                      </tr>
+                      {products.length === 0 ? (
+                        <tr>
+                          <td colSpan={4} className="px-4 py-12 text-center text-gray-500">
+                            No products found. Click "Add Product" to get started.
+                          </td>
+                        </tr>
+                      ) : (
+                        products.slice(0, 10).map((product) => (
+                          <tr key={product.id} className="hover:bg-gray-50">
+                            <td className="px-4 py-4 whitespace-nowrap">
+                              <div className="font-medium text-[#1a1a1a]">
+                                {product.name}
+                              </div>
+                            </td>
+                            <td className="px-4 py-4 whitespace-nowrap text-right">
+                              <span className="font-medium text-green-600">
+                                {formatCurrency(product.price)}
+                              </span>
+                            </td>
+                            <td className="px-4 py-4 whitespace-nowrap">
+                              <div className="flex items-center">
+                                {product.is_active ? (
+                                  <>
+                                    <CheckCircle2 className="w-4 h-4 text-green-500 mr-1.5" />
+                                    <span className="text-sm text-gray-800">Active</span>
+                                  </>
+                                ) : (
+                                  <>
+                                    <X className="w-4 h-4 text-red-500 mr-1.5" />
+                                    <span className="text-sm text-gray-800">Inactive</span>
+                                  </>
+                                )}
+                              </div>
+                            </td>
+                            <td className="px-4 py-4 whitespace-nowrap text-right text-sm font-medium">
+                              <button
+                                onClick={() => toggleProductStatus(product.id, product.is_active)}
+                                className="text-gray-400 hover:text-[#1a1a1a] p-1.5 rounded-lg hover:bg-gray-100"
+                              >
+                                <Edit2 className="w-4 h-4" />
+                              </button>
+                            </td>
+                          </tr>
+                        ))
+                      )}
                     </tbody>
                   </table>
                 </div>
@@ -359,11 +601,53 @@ function AdminDashboard() {
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
-                  <tr>
-                    <td colSpan={4} className="px-4 py-12 text-center text-gray-500">
-                      No products found. Click "Add Product" to get started.
-                    </td>
-                  </tr>
+                  {products.length === 0 ? (
+                    <tr>
+                      <td colSpan={4} className="px-4 py-12 text-center text-gray-500">
+                        No products found. Click "Add Product" to get started.
+                      </td>
+                    </tr>
+                  ) : (
+                    products.map((product) => (
+                      <tr key={product.id} className="hover:bg-gray-50">
+                        <td className="px-4 py-4 whitespace-nowrap">
+                          <div className="font-medium text-[#1a1a1a]">
+                            {product.name}
+                          </div>
+                        </td>
+                        <td className="px-4 py-4 whitespace-nowrap text-right">
+                          <span className="font-medium text-green-600">
+                            {formatCurrency(product.price)}
+                          </span>
+                        </td>
+                        <td className="px-4 py-4 whitespace-nowrap">
+                          <div className="flex items-center">
+                            {product.is_active ? (
+                              <>
+                                <CheckCircle2 className="w-4 h-4 text-green-500 mr-1.5" />
+                                <span className="text-sm text-gray-800">Active</span>
+                              </>
+                            ) : (
+                              <>
+                                <X className="w-4 h-4 text-red-500 mr-1.5" />
+                                <span className="text-sm text-gray-800">Inactive</span>
+                              </>
+                            )}
+                          </div>
+                        </td>
+                        <td className="px-4 py-4 whitespace-nowrap text-right text-sm font-medium">
+                          <div className="flex justify-end">
+                            <button
+                              onClick={() => toggleProductStatus(product.id, product.is_active)}
+                              className="text-gray-400 hover:text-[#1a1a1a] p-1.5 rounded-lg hover:bg-gray-100"
+                            >
+                              <Edit2 className="w-4 h-4" />
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))
+                  )}
                 </tbody>
               </table>
             </div>
@@ -457,7 +741,7 @@ function AdminDashboard() {
                   Cancel
                 </button>
                 <button
-                  onClick={() => {}}
+                  onClick={handleCreateUser}
                   className="px-6 py-2.5 bg-[#1a1a1a] text-white font-medium rounded-xl hover:bg-[#2d2d2d] transition-colors"
                 >
                   Create User
@@ -536,7 +820,7 @@ function AdminDashboard() {
                   Cancel
                 </button>
                 <button
-                  onClick={() => {}}
+                  onClick={handleCreateProduct}
                   className="px-6 py-2.5 bg-[#1a1a1a] text-white font-medium rounded-xl hover:bg-[#2d2d2d] transition-colors"
                 >
                   Create Product
