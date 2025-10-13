@@ -4,9 +4,7 @@
  * Live Production Environment
  */
 
-const PESAPAL_API_URL = 'https://pay.pesapal.com/v3'
-const CONSUMER_KEY = process.env.PESAPAL_CONSUMER_KEY || ''
-const CONSUMER_SECRET = process.env.PESAPAL_CONSUMER_SECRET || ''
+const PESAPAL_IPN_ID = process.env.PESAPAL_IPN_ID
 
 interface PesapalAuthResponse {
   token: string

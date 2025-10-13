@@ -160,7 +160,7 @@ export async function POST(request: NextRequest) {
       // Initiate Pesapal payment (STK Push)
       try {
         const callbackUrl = `${process.env.NEXT_PUBLIC_BASE_URL || 'https://yaya-pos-system.vercel.app'}/payment/callback`
-        const notificationId = process.env.PESAPAL_IPN_ID || ''
+        const notificationId = PESAPAL_IPN_ID || ''
 
         const pesapalResponse = await initiateMobileMoneyPayment({
           orderId: merchantReference,
