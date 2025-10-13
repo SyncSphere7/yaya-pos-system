@@ -35,17 +35,17 @@ function POSDashboard() {
   const [paymentMessage, setPaymentMessage] = useState('')
 
   useEffect(() => {
-    if (user?.locationId) {
+    if (user?.location_id) {
       loadData()
     }
-  }, [user?.locationId, selectedCategory])
+  }, [user?.location_id, selectedCategory])
 
   const loadData = async () => {
     setIsLoading(true)
     const [productsRes, categoriesRes, tablesRes] = await Promise.all([
-      supabase.from('products').select('*').eq('location_id', user?.locationId).eq('is_active', true),
+      supabase.from('products').select('*').eq('location_id', user?.location_id).eq('is_active', true),
       supabase.from('categories').select('*'),
-      supabase.from('tables').select('*').eq('location_id', user?.locationId).eq('status', 'available')
+      supabase.from('tables').select('*').eq('location_id', user?.location_id).eq('status', 'available')
     ])
     
     setProducts(productsRes.data || [])
@@ -91,7 +91,7 @@ function POSDashboard() {
       const orderNumber = `ORD-${Date.now()}`
       const { data: order, error: orderError } = await supabase.from('orders').insert({
         order_number: orderNumber,
-        location_id: user?.locationId,
+        location_id: user?.location_id,
         user_id: user?.id,
         table_id: selectedTable || null,
         subtotal,
@@ -109,7 +109,8 @@ function POSDashboard() {
         order_id: order.id,
         product_id: item.id,
         quantity: item.quantity,
-        unit_price: item.price
+        unit_price: item.price,
+        total_price: item.price * item.quantity
       }))
 
       const { error: itemsError } = await supabase.from('order_items').insert(orderItems)
@@ -134,7 +135,7 @@ function POSDashboard() {
           confirmation_code: `CASH-${Date.now()}`,
           reference_number: `CASH-${order.id}`,
           processed_by: user?.id,
-          location_id: user?.locationId,
+          location_id: user?.location_id,
           currency: 'UGX',
           payment_description: 'Cash payment'
         })
@@ -167,7 +168,7 @@ function POSDashboard() {
             paymentMethod,
             phoneNumber,
             processedBy: user?.id,
-            locationId: user?.locationId
+            locationId: user?.location_id
           })
         })
 
@@ -193,7 +194,7 @@ function POSDashboard() {
             amount: total,
             paymentMethod: 'card_pos',
             processedBy: user?.id,
-            locationId: user?.locationId
+            locationId: user?.location_id
           })
         })
 
@@ -216,6 +217,10 @@ function POSDashboard() {
     } finally {
       setIsProcessing(false)
     }
+  }
+
+  const handleLogout = async () => {
+    await useAuthStore.getState().signOut()
   }
 
   const pollPaymentStatus = async (paymentId: string, orderId: string) => {
