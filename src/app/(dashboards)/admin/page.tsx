@@ -230,6 +230,20 @@ function AdminDashboard() {
     }
   }
 
+  const toggleProductStatus = async (productId: string, currentStatus: boolean) => {
+    try {
+      const { error } = await supabase
+        .from('products')
+        .update({ is_active: !currentStatus })
+        .eq('id', productId)
+
+      if (error) throw error
+      loadProducts()
+    } catch (error: any) {
+      setError(error.message)
+    }
+  }
+
   const handleLogout = async () => {
     await useAuthStore.getState().signOut()
   }
