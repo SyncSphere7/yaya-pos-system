@@ -5,7 +5,17 @@ import { useAuthStore } from '@/stores/auth'
 import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabase'
 import { formatCurrency } from '@/lib/utils'
-import { CreditCard, Smartphone, DollarSign, CheckCircle, AlertCircle, Phone, Clock, Wifi, LogOut } from 'lucide-react'
+import { 
+  CreditCard, 
+  Smartphone, 
+  DollarSign, 
+  CheckCircle, 
+  AlertCircle, 
+  Phone, 
+  Clock, 
+  Wifi, 
+  LogOut 
+} from 'lucide-react'
 
 export default function POSPage() {
   return (
